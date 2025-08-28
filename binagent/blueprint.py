@@ -171,7 +171,7 @@ def _create_nested_function_analysis_config(max_iterations: int, level: int = 4)
     )
 
 def create_binary_analysis_config(
-    max_iterations: int = 70,
+    max_iterations: int = 30,
     system_prompt: Optional[str] = None,
     max_nesting_level: int = 4,
 ) -> AgentConfig:
@@ -203,7 +203,7 @@ def create_binary_analysis_config(
     return planner_config
 
 def create_binary_verification_config(
-    max_iterations: int = 70,
+    max_iterations: int = 30,
     system_prompt: Optional[str] = None,
     max_nesting_level: int = 4,
 ) -> AgentConfig:
@@ -240,7 +240,7 @@ class BinaryAnalysisMasterAgent:
         output_dir: str,
         user_input: str,
         executable_path: str,
-        max_iterations_per_agent: int = 70,
+        max_iterations_per_agent: int = 30,
         agent_instance_name: Optional[str] = "BinaryMasterAgent",
     ):
         if not os.path.isfile(executable_path):
