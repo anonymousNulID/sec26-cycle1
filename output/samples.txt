@@ -1,6 +1,6 @@
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6200v2-V1.0.3.12_10.1.11/fw/_R6200v2-V1.0.3.12_10.1.11.chk.extracted/squashfs-root/sbin/rc
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("PHYSDEVDRIVER") at 0x18644 (fcn.00018598)
     - Step: 0x00017664: bl sym.imp.strncpy(dest, src=param_1, n=3) --> Copies first 3 bytes of tainted env value to stack buffer
     - Step: 0x00017678: bl sym.imp.sprintf(s, format="/sys/block/%s/queue/read_ahead_kb", arg=tainted_buffer) --> Inserts tainted data into path string
@@ -11,7 +11,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6200v2-V1.0.3.12_10.1.11/
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6200v2-V1.0.3.12_10.1.11/fw/_R6200v2-V1.0.3.12_10.1.11.chk.extracted/squashfs-root/sbin/rc
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.getenv("PHYSDEVDRIVER") @0x18640 (fcn.00018598)
     - Step: ldr r1, str._s_d_c_d ; mov r2, sl ; bl sym.imp.sprintf --> Environment variable formatted into r4 buffer @0x1879c (fcn.00018598)
     - Step: mov r1, r8 ; bl fcn.00017610 --> Passes tainted buffer to subfunction @0x188a4 (fcn.00018598)
@@ -24,17 +24,17 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6200v2-V1.0.3.12_10.1.11/
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6200v2-V1.0.3.12_10.1.11/fw/_R6200v2-V1.0.3.12_10.1.11.chk.extracted/squashfs-root/sbin/rc
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.nvram_get("iptv_interfaces") @0x14800 --> [Obtains untrusted user input from NVRAM]
     - Step: mov r1, r0 @0x14808 --> [Tainted data transferred from r0 to r1]
     - Step: mov r0, r4 @0x1480c --> [Target buffer address loaded into r0]
     - Sink: bl sym.imp.strcpy(r0, r1) @0x14814 --> [Tainted data directly copied to stack buffer]
-  Reason: Verified based on r2 disassembly: 1) Direct register propagation path exists from taint source (nvram_get) to sink (strcpy) (r0→r1→strcpy parameters); 2) No intermediate validation or sanitization instructions; 3) Target buffer resides within function stack frame (sub sp, sp, 0x10c at 0x00014200 confirms limited local variable space); 4) Threat model allows attackers to control iptv_interfaces content. Meets criteria for buffer overflow vulnerability.
+  Reason: Verified based on r2 disassembly: 1) Direct register Taint Propagation Path path exists from taint source (nvram_get) to sink (strcpy) (r0→r1→strcpy parameters); 2) No intermediate validation or sanitization instructions; 3) Target buffer resides within function stack frame (sub sp, sp, 0x10c at 0x00014200 confirms limited local variable space); 4) Threat model allows attackers to control iptv_interfaces content. Meets criteria for buffer overflow vulnerability.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6300/fw/_R6300v2-V1.0.4.18_10.0.84.chk.extracted/squashfs-root/usr/local/samba/nmbd
-  Propagation:
+  Taint Propagation Path:
     - Source: Environment variable 'HOME' via getenv() at 0x1f394
     - Step: 0x1f394: bl sym.imp.getenv --> r0 = getenv("HOME")
     - Step: 0x1f3b8: bl sym.imp.strcpy --> strcpy(sp, r0) with tainted HOME value
@@ -48,30 +48,30 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6300/fw/_R6300v2-V1.0.4.1
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6300/fw/_R6300v2-V1.0.4.18_10.0.84.chk.extracted/squashfs-root/usr/local/samba/nmbd
-  Propagation:
+  Taint Propagation Path:
     - Source: Environment variable 'PATH' via getenv() at 0x1cc08
     - Step: 0x1cc08: bl sym.imp.getenv --> r0 = getenv("PATH")
     - Step: 0x1cc10: mov r8, r0 --> tainted PATH value moved to r8
     - Step: 0x1cc9c: mov r1, r8 --> r1 = tainted PATH value
     - Step: 0x1cca4: mov r0, sp --> r0 = destination stack buffer
     - Sink: 0x1cca8: bl sym.imp.strcpy --> strcpy(r0, r1) without length check
-  Reason: Based on r2 evidence: 1) Parameter at 0x1cc08 points to the 'PATH' string 2) Register propagation path (r0→r8→r1) verified through multiple address instructions 3) strcpy destination is stack pointer (sp) 4) Only NULL check (cmp r8,0) exists in the path but no data length validation or filtering. Attacker can trigger stack overflow by controlling PATH.
+  Reason: Based on r2 evidence: 1) Parameter at 0x1cc08 points to the 'PATH' string 2) Register Taint Propagation Path path (r0→r8→r1) verified through multiple address instructions 3) strcpy destination is stack pointer (sp) 4) Only NULL check (cmp r8,0) exists in the path but no data length validation or filtering. Attacker can trigger stack overflow by controlling PATH.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6300/fw/_R6300v2-V1.0.4.18_10.0.84.chk.extracted/squashfs-root/usr/local/samba/nmbd
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("HOME") at 0x1f394: bl sym.imp.getenv → r7 = [pc, #offset] ; r7 = tainted value
     - Step: 0x1f3b8: mov r0, sp; mov r1, r7; bl sym.imp.strcpy → copies tainted data to stack buffer (sp)
     - Step: 0x1f3c0: mov r0, sp; bl sym.imp.strlen → get buffer length; 0x1f3cc: add r0, sp, r0 → dest=sp+strlen(sp); 0x1f3c8: mov r2, 7 → length=7; 0x1f3d0: add r1, r4, [0x1f3f8] → src=r4+0x79ec (/.popt); 0x1f3d4: bl sym.imp.memcpy → appends 7-byte string
     - Step: 0x1f3dc: mov r1, sp → passes tainted path pointer to poptReadConfigFile
     - Sink: 0x1f170 (in poptReadConfigFile): mov r0, r1; bl sym.imp.open64 → executes with attacker-controlled path
-  Reason: Complete taint propagation path: 1) Environment variable taints r7 2) strcpy copies to stack 3) memcpy appends fixed string (actual length 7 instead of 6 as described in the clue) 4) Passed to open64. Key differences: memcpy length parameter is 7 (misstated as 6 in the clue) and source address is calculated via r4+offset (not a direct constant). However, because: ① The concatenated content is essentially the same (/.popt+null) ② Tainted data is never sanitized throughout ③ Attacker fully controls the path prefix via HOME, this still constitutes an arbitrary file read vulnerability.
+  Reason: Complete taint Taint Propagation Path path: 1) Environment variable taints r7 2) strcpy copies to stack 3) memcpy appends fixed string (actual length 7 instead of 6 as described in the clue) 4) Passed to open64. Key differences: memcpy length parameter is 7 (misstated as 6 in the clue) and source address is calculated via r4+offset (not a direct constant). However, because: ① The concatenated content is essentially the same (/.popt+null) ② Tainted data is never sanitized throughout ③ Attacker fully controls the path prefix via HOME, this still constitutes an arbitrary file read vulnerability.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/fw/_R6400v2-V1.0.2.46_1.0.36.chk.extracted/squashfs-root/usr/sbin/check_db
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get("ver_check_ftp_username") @ 0xb100 --> Loads user-controllable variable from NVRAM into r0
     - Step: 0xb104: mov r7, r0 --> Tainted value stored in r7
     - Step: 0xb124: mov r3, r7 --> Tainted value moved to r3 as sprintf parameter
@@ -83,7 +83,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/f
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/fw/_R6400v2-V1.0.2.46_1.0.36.chk.extracted/squashfs-root/usr/sbin/check_db
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get("ver_check_ftp_username") @ 0xa710 --> Returns NVRAM value stored in r0
     - Step: mov r8, r0 @ 0xa714 --> Tainted value transferred from r0 to r8
     - Step: sprintf(sp-0x280, "rm -f %s;ftpc -u %s -p %s...", ..., r8) @ 0xa764 --> Tainted value r8 embedded as -u parameter in command string
@@ -94,7 +94,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/f
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/fw/_R6400v2-V1.0.2.46_1.0.36.chk.extracted/squashfs-root/usr/sbin/check_db
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get("ver_check_config_file") @ 0xa724 --> Loading unvalidated NVRAM configuration value into r0
     - Step: 0xa72c: mov r6, r0 --> Tainted value moved into register r6
     - Step: 0xa75c: str r6, [sp+0xc] --> Tainted value stored at stack offset 0xc
@@ -105,17 +105,17 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/f
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/fw/_R6400v2-V1.0.2.46_1.0.36.chk.extracted/squashfs-root/usr/sbin/check_db
-  Propagation:
+  Taint Propagation Path:
     - Source: 0xa710: bl sym.imp.acosNvramConfig_get ; Get 'ver_check_ftp_username' NVRAM value (taint source)
     - Step: 0xa714: mov r8, r0 ; Tainted data stored in register r8
     - Step: 0xa764: bl sym.imp.sprintf ; Concatenate r8 (tainted data) as %s parameter into command buffer
     - Sink: 0xa76c: bl sym.imp.system ; Execute command in the buffer
-  Reason: r2 evidence confirms complete propagation path: 1) NVRAM value directly stored in register after retrieval 2) Embedded as unfiltered parameter in system command 3) Attacker can inject commands (e.g., ';malicious#') by setting NVRAM. Consistent with the essential vulnerability characteristics described in the clue.
+  Reason: r2 evidence confirms complete Taint Propagation Path path: 1) NVRAM value directly stored in register after retrieval 2) Embedded as unfiltered parameter in system command 3) Attacker can inject commands (e.g., ';malicious#') by setting NVRAM. Consistent with the essential vulnerability characteristics described in the clue.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/fw/_R6400v2-V1.0.2.46_1.0.36.chk.extracted/squashfs-root/usr/sbin/check_db
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get('ver_check_ftp_username') @0xb100 (ldr r0, 0xb63c)
     - Step: mov r7, r0 @0xb104 --> Tainted value stored in r7 (uVar9)
     - Step: mov r3, r7 @0xb124; bl sym.imp.sprintf @0xb144 --> Tainted data formatted into buffer (r5) using template @0xb818
@@ -125,7 +125,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/f
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/fw/_R6400v2-V1.0.2.46_1.0.36.chk.extracted/squashfs-root/usr/sbin/check_db
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.acosNvramConfig_get @0xb10c --> Returns FTP password in r0
     - Step: 0x0000b110 mov r6, r0 --> Tainted password stored in r6
     - Step: 0x0000b138 str r6, [sp] --> Password pushed as 3rd argument to sprintf
@@ -136,7 +136,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/f
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/fw/_R6400v2-V1.0.2.46_1.0.36.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: NVRAM variable 'fw_email_email_addr_2' via acosNvramConfig_get @ 0xc7f8
     - Step: 0x0000c7f4: ldr r0, str.fw_email_email_addr_2 --> Load variable name address
     - Step: 0x0000c7f8: bl sym.imp.acosNvramConfig_get --> Fetch tainted value to r0
@@ -148,18 +148,18 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/f
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/fw/_R6400v2-V1.0.2.46_1.0.36.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: ldr r0, str.fw_email_email_time_type @ 0xc5f0; bl sym.imp.acosNvramConfig_get --> NVRAM variable read
     - Step: bl sym.imp.atoi @ 0xc608 --> String converted to integer (r0)
     - Step: str r0, [r4, 0xd8] @ 0xc610 --> Stored at global address 0x15b74 (r4=0x15a9c)
     - Step: ldr r2, [0xc998] @ 0xc7b0 --> Loaded value from 0x15b74 into r2 (0xc998 points to 0x15b74)
     - Sink: mov r0, r5; movt r1, 0x4004; bl sym.imp.ioctl @ 0xc7bc --> Tainted r2 passed as ioctl 3rd argument
-  Reason: The clue misdescribed the child process path (the actual child process exits directly at 0xc7d4), but the parent process has a complete propagation chain: 1) NVRAM read and atoi conversion confirmed 2) Global address 0x15b74 stores the tainted value 3) ioctl@0xc7bc uses this value without sanitization. An attacker can control the NVRAM variable to influence the ioctl parameter, constituting a real vulnerability.
+  Reason: The clue misdescribed the child process path (the actual child process exits directly at 0xc7d4), but the parent process has a complete Taint Propagation Path chain: 1) NVRAM read and atoi conversion confirmed 2) Global address 0x15b74 stores the tainted value 3) ioctl@0xc7bc uses this value without sanitization. An attacker can control the NVRAM variable to influence the ioctl parameter, constituting a real vulnerability.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/fw/_R6400v2-V1.0.2.46_1.0.36.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: recv(socket_fd, puVar18, len, 0) @ 0xa3d4 (function fcn.00009d5c)
     - Step: do { puVar12 = puVar18; uVar14 = *puVar12; ... puVar18++ } while (char in [0x20/space, 0x30-0x39/digit, 0x2e/dot]); --> Extract substring (skip allowed chars)
     - Step: sprintf(*0xae60, *0xae58, puVar12) @ fcn.00009d5c error branch --> Format command with tainted input
@@ -169,7 +169,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6400v2-V1.0.2.46_1.0.36/f
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6700-V1.0.1.36_10.0.40/fw/_R6700-V1.0.1.36_10.0.40.chk.extracted/squashfs-root/usr/sbin/arp_check
-  Propagation:
+  Taint Propagation Path:
     - Source: 0x9f50: bl sym.imp.recv → Externally controllable data stored in r8 buffer
     - Step: 0x9fa8: ldrb r3, [r8, r4] → Loads single byte from tainted buffer into r3 register
     - Step: 0x9fbc: bl sym.imp.sprintf(r5, "%s %02x", r5, r3) → Formats tainted byte (r3) as hex string and appends to r5
@@ -180,7 +180,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6700-V1.0.1.36_10.0.40/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6700-V1.0.1.36_10.0.40/fw/_R6700-V1.0.1.36_10.0.40.chk.extracted/squashfs-root/usr/sbin/dlnad
-  Propagation:
+  Taint Propagation Path:
     - Source: NVRAM variable 'iserver_remote_passcode' via acosNvramConfig_get() at 0x975c
     - Step: 0x9764: mov r2, r0 --> Tainted NVRAM value transferred from r0 to r2
     - Step: 0x976c: sprintf(r7, "echo \"NoDeviceName\r\n%s\" > /tmp/shares/forked_daapd.remote", r2) --> Tainted data (r2) formatted into buffer r7 without sanitization
@@ -190,7 +190,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6700-V1.0.1.36_10.0.40/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6700-V1.0.1.36_10.0.40/fw/_R6700-V1.0.1.36_10.0.40.chk.extracted/squashfs-root/usr/sbin/dlnad
-  Propagation:
+  Taint Propagation Path:
     - Source: sym.imp.acosNvramConfig_get("iserver_remote_passcode") @ 0x975c
     - Step: mov r2, r0 @ 0x9764 --> Tainted return value stored in r2
     - Step: ldr r1, str.echo__NoDeviceName_r_n_s_____tmp_shares_forked_daapd.remote @ 0x9760 --> Load format string with %s placeholder
@@ -201,7 +201,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6700-V1.0.1.36_10.0.40/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6700-V1.0.1.36_10.0.40/fw/_R6700-V1.0.1.36_10.0.40.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get('fw_email_email_addr') @ 0x9d5c (r0 = sym.imp.acosNvramConfig_get(*0xaddc))
     - Step: strcpy(*(iVar24 + -0x14c4), r0) @ 0x9d5c (Decompiled code: sym.imp.strcpy(*(iVar24 + -0x14c4), uVar8))
     - Step: strcat(puVar23, *(iVar24 + -0x14c4)) @ SMTP state machine case 1 (Decompiled code: sym.imp.strcat(puVar23, *(iVar24 + -0x14c4)))
@@ -212,7 +212,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R6700-V1.0.1.36_10.0.40/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7000/fw/_R7000P-V1.3.0.8_1.0.93.chk.extracted/squashfs-root/sbin/mstat
-  Propagation:
+  Taint Propagation Path:
     - Source: ldr r0, str.wwan_runtime_manuf at 0x8aa0 --> Loads address of attacker-controlled NVRAM variable
     - Step: bl sym.imp.acosNvramConfig_get at 0x8aa4 --> Returns tainted data to r0
     - Step: mov r1, r0 at 0x8aa8 --> Moves tainted data to strcpy's src parameter register r1
@@ -223,7 +223,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7000/fw/_R7000P-V1.3.0.8_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7000/fw/_R7000P-V1.3.0.8_1.0.93.chk.extracted/squashfs-root/usr/sbin/ftp
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("SHELL") called at 0xd1a4 --> Return value stored in r0
     - Step: 0xd1a8: subs r4, r0, 0 --> Tainted data moved from r0 to r4
     - Step: 0xd210: mov r0, r4 --> Tainted r4 moved to r0 (first argument)
@@ -233,10 +233,10 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7000/fw/_R7000P-V1.3.0.8_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7000/fw/_R7000P-V1.3.0.8_1.0.93.chk.extracted/squashfs-root/usr/sbin/ftp
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("SHELL") at 0xd1a4 → r0 (environment variable value)
     - Step: 0xd1a8: subs r4, r0, 0 → Tainted data moved from r0 to r4
-    - Step: 0xd208: beq 0xd258 → Conditional branch to propagation path (verified)
+    - Step: 0xd208: beq 0xd258 → Conditional branch to Taint Propagation Path path (verified)
     - Step: 0xd258: mov r0, r4 → Tainted r4 moved to r0 (first argument)
     - Step: 0xd260: mov r2, r5 ; 0xd264: bl sym.imp.execl → execl(r0, r1, r2) with tainted r0
     - Sink: execl() call at 0xd264 (executes tainted r0)
@@ -245,17 +245,17 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7000/fw/_R7000P-V1.3.0.8_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/_R7300-V1.0.0.56_1.0.18.chk.extracted/squashfs-root/sbin/bd
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get("wla_ssid") @ 0x9320 (r0 = NVRAM value)
     - Step: mov r1, r0 @ 0x9328 --> Tainted data moved to strcpy source
     - Step: mov r0, r5 @ 0x932c --> Destination: stack buffer at sp+0x400 (var_400h)
     - Sink: bl sym.imp.strcpy @ 0x9330 --> Unbounded copy to 800-byte buffer
-  Reason: 1) Propagation path verified: r2 disassembly confirms the instruction sequence (0x9320-0x9330) exactly matches the clues, with tainted data propagating directly from source to sink; 2) Vulnerability confirmed: Target buffer is on the stack (sp+0x400), size 800 bytes (0x320), total stack frame size is 0x720 bytes, return address located at sp+0x72C. Writing 800 bytes will corrupt the stack structure and potentially control the return address; 3) Partial inaccuracy: The clue states the buffer is 328 bytes from the return address, but actual calculation shows 812 bytes (0x32C), yet buffer overflow can still overwrite the return address; 4) No sanitization: The instruction sequence lacks filtering/validation operations.
+  Reason: 1) Taint Propagation Path path verified: r2 disassembly confirms the instruction sequence (0x9320-0x9330) exactly matches the clues, with tainted data propagating directly from source to sink; 2) Vulnerability confirmed: Target buffer is on the stack (sp+0x400), size 800 bytes (0x320), total stack frame size is 0x720 bytes, return address located at sp+0x72C. Writing 800 bytes will corrupt the stack structure and potentially control the return address; 3) Partial inaccuracy: The clue states the buffer is 328 bytes from the return address, but actual calculation shows 812 bytes (0x32C), yet buffer overflow can still overwrite the return address; 4) No sanitization: The instruction sequence lacks filtering/validation operations.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/_R7300-V1.0.0.56_1.0.18.chk.extracted/squashfs-root/sbin/bd
-  Propagation:
+  Taint Propagation Path:
     - Source: ldr r0, str.wla_defaKey; bl acosNvramConfig_get @ 0x9494-0x9498 --> Retrieves NVRAM parameter 'wla_defaKey' into r0
     - Step: bl sym.imp.atoi @ 0x949c --> Converts string to integer (r0=index value)
     - Step: add r2, r0, 1 @ 0x94a4 --> Calculates dynamic index value (r2=index+1)
@@ -267,7 +267,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/_R7300-V1.0.0.56_1.0.18.chk.extracted/squashfs-root/sbin/bd
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get(*0x9730) @0x937c (r0 = 'wla_wep_length' NVRAM value)
     - Step: bl sym.imp.atoi @0x945c --> Converts to long integer stored in iVar2
     - Step: sprintf(puVar8-0x220, "wla_key%d", iVar2+1) @0x94a4 --> Generates dynamic variable name
@@ -278,7 +278,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/_R7300-V1.0.0.56_1.0.18.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: Network input structure (param_1+8) via function parameter @ r1 (used in inet_ntop)
     - Step: 0x8ec0: bl sym.imp.inet_ntop(10, r1, r2, 0x80) --> Converts raw network data to string in r4 buffer
     - Step: 0x8eec: mov r2, r4 --> Transfers tainted buffer address to sprintf argument
@@ -289,7 +289,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/_R7300-V1.0.0.56_1.0.18.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: Parameter provided by user via command line option -I (e.g., -I "; malicious_command")
     - Step: 0x0000a2c0: ldr r1, [r7] --> Loads optarg (user input) into register r1
     - Step: 0x0000a2d0: ldr r0, [0x0000a340] --> Loads the address of lan_ipaddr (0x12bac) into r0
@@ -302,7 +302,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/_R7300-V1.0.0.56_1.0.18.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: recvmsg at 0x9410 in fcn.00009324 (bl sym.imp.recvmsg) --> Receives tainted network input
     - Step: fcn.00009dc0@0x9e44: bl fcn.00009574(r0, r1, ...) with r1=tainted_buffer --> Passes tainted buffer
     - Step: fcn.00009574: if (*pcVar8 == '\x05') { uVar17 = *(pcVar8+4) } --> Reads tainted value at buffer+0x14
@@ -313,7 +313,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/_R7300-V1.0.0.56_1.0.18.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: recvmsg at 0x9410 in fcn.00009324 receives network input, tainting buffer passed to fcn.00009574
     - Step: if (*pcVar8 == 3) { puVar7 = pcVar8 + 0x10; ... } at fcn.00009574 --> Accesses tainted IPv6 option data (offset 0x10)
     - Step: *(stack -0x24) = *puVar7; ... at fcn.00009574 --> Stores tainted IPv6 address in stack variables
@@ -326,16 +326,16 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R7300-V1.0.0.56_1.0.18/fw/_R7300-V1.0.0.56_1.0.18.chk.extracted/squashfs-root/usr/sbin/wandetect
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_read(*0xcf50, iVar19 - 0xa4, 0x1e) (near 0xcaa0) --> Reads NVRAM variable 'lan_ifname' into stack buffer [iVar19-0xa4]
     - Step: sprintf(iVar19 - 0x264, *0xcf98 ('ifconfig %s %s'), iVar19 - 0xa4, ...) --> Tainted data from [iVar19-0xa4] is formatted into command string at [iVar19-0x264]
     - Sink: system(iVar19 - 0x264) at 0xcb28 --> Executes the command string containing tainted data
-  Reason: Decompilation evidence shows: 1) NVRAM read directly writes to a stack buffer; 2) Tainted data is injected as a parameter into the sprintf format string; 3) The generated command string is directly passed to system() for execution. String search confirms the format string is 'ifconfig %s %s'. The entire propagation path lacks any filtering or encoding operations, allowing an attacker to inject arbitrary commands by controlling 'lan_ifname'.
+  Reason: Decompilation evidence shows: 1) NVRAM read directly writes to a stack buffer; 2) Tainted data is injected as a parameter into the sprintf format string; 3) The generated command string is directly passed to system() for execution. String search confirms the format string is 'ifconfig %s %s'. The entire Taint Propagation Path path lacks any filtering or encoding operations, allowing an attacker to inject arbitrary commands by controlling 'lan_ifname'.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_R8000-V1.0.4.4_1.1.42.chk.extracted/squashfs-root/sbin/rc
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("PHYSDEVDRIVER") @0x1d210: bl sym.imp.getenv --> value stored in sl(r6)
     - Step: @0x1d3e8: mov r2, sl; add r3, arg_61h; bl sym.imp.sprintf --> tainted data formatted into r4 buffer
     - Step: @0x1d564: mov r0, r4; bl fcn.0001c0fc --> tainted buffer passed to subfunction
@@ -348,7 +348,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_R8000-V1.0.4.4_1.1.42.chk.extracted/squashfs-root/sbin/rc
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("PHYSDEVDRIVER") @0x1d210 → value stored in sl register
     - Step: 0x1d370: mov r2, sl → 0x1d37c: bl sym.imp.sprintf(r4, "%s%c%d", sl) → Tainted sl embedded in r4
     - Step: 0x1d384: mov r2, r4 → 0x1d38c: bl sym.imp.sprintf(r5, "/dev/%s", r4) → Forms absolute path in r5
@@ -356,12 +356,12 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_
     - Step: Inside fcn.0001c5b8: strcpy(stack_buf, r5) → 0x1c6a8: bl fcn.0001c3a4(stack_buf) → Processes tainted device path
     - Step: Inside fcn.0001c3a4: 0x1c41c: bl sym.imp.snprintf(r4, ... , stack_buf) → Embeds tainted path in command string
     - Sink: 0x1c424: bl sym.imp.system(r4) → Executes constructed mount command with tainted input
-  Reason: Complete taint propagation path is verifiable: 1) Environment variable input is formatted twice via sprintf to form a device path; 2) The path is passed to a mount function and embedded into a command template via snprintf; 3) Finally, a system call is executed at 0x1c424. An attacker can inject PHYSDEVDRIVER to execute arbitrary commands (e.g., '/dev/sda1;reboot;'), meeting the criteria for command injection. The sink address (0x1c550) in the clue is incorrect, but the actual dangerous operation (0x1c424) has been confirmed.
+  Reason: Complete taint Taint Propagation Path path is verifiable: 1) Environment variable input is formatted twice via sprintf to form a device path; 2) The path is passed to a mount function and embedded into a command template via snprintf; 3) Finally, a system call is executed at 0x1c424. An attacker can inject PHYSDEVDRIVER to execute arbitrary commands (e.g., '/dev/sda1;reboot;'), meeting the criteria for command injection. The sink address (0x1c550) in the clue is incorrect, but the actual dangerous operation (0x1c424) has been confirmed.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_R8000-V1.0.4.4_1.1.42.chk.extracted/squashfs-root/usr/sbin/httpd
-  Propagation:
+  Taint Propagation Path:
     - Source: 0x7bcc4: ldr r0, str.http_passwd ; 0x7bcc8: bl sym.imp.acosNvramConfig_get --> Retrieves the http_passwd value from NVRAM and stores it in r0
     - Step: 0x7bcd0: mov r2, r0 --> Moves the http_passwd value into r2 as a parameter
     - Step: 0x7bcd4: mov r0, sp --> Sets the stack pointer as the output buffer for sprintf
@@ -372,7 +372,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_R8000-V1.0.4.4_1.1.42.chk.extracted/squashfs-root/usr/sbin/httpd
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.nvram_get('max_download_speed') at 0x881e8 --> Retrieves unvalidated NVRAM value
     - Step: 0x881ec: mov r2, r0 --> Tainted data transferred from r0 to r2
     - Step: 0x881fc: bl sym.imp.sprintf(buf, '--limit-rate=%sk', r2) --> User input directly embedded into format string
@@ -383,7 +383,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_R8000-V1.0.4.4_1.1.42.chk.extracted/squashfs-root/usr/sbin/httpd
-  Propagation:
+  Taint Propagation Path:
     - Source: NVRAM variable 'http_passwd' set via authenticated configuration
     - Step: 0x7bc9c: ldr r0, [str.http_passwd] ; bl sym.imp.acosNvramConfig_get --> Loads tainted 'http_passwd' value into r0
     - Step: 0x7bca8: mov r2, r0 ; ldr r1, [str.echo___s_____tmp_afppasswd] --> Transfers tainted r0 to r2 (sprintf argument) while loading format string
@@ -394,7 +394,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_R8000-V1.0.4.4_1.1.42.chk.extracted/squashfs-root/usr/sbin/httpd
-  Propagation:
+  Taint Propagation Path:
     - Source: NVRAM variable 'http_passwd' via authenticated configuration
     - Step: 0x7bcc4: ldr r0, str.http_passwd --> Load key 'http_passwd'
     - Step: 0x7bcc8: bl sym.imp.acosNvramConfig_get --> Tainted value stored in r0
@@ -403,12 +403,12 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_
     - Step: 0x7bcd4: mov r0, sp --> Set destination buffer (sp) for sprintf
     - Step: 0x7bcd8: bl sym.imp.sprintf --> Construct command with tainted %s
     - Sink: 0x7bcdc: mov r0, sp ; 0x7bce0: bl sym.imp.system --> Execute constructed command via system(sp)
-  Reason: Verification confirms the existence of a complete propagation path: 1) Correction of key instruction position deviation (format string is actually loaded at 0x7bccc); 2) Tainted data flows through registers r0→r2→sprintf→sp→system; 3) No evidence of sanitization (e.g., filtering/encoding); 4) Attacker can control the http_passwd value to construct malicious commands. The description of instruction addresses in the clue contains deviations, but the core data flow and dangerous operations are reproducible.
+  Reason: Verification confirms the existence of a complete Taint Propagation Path path: 1) Correction of key instruction position deviation (format string is actually loaded at 0x7bccc); 2) Tainted data flows through registers r0→r2→sprintf→sp→system; 3) No evidence of sanitization (e.g., filtering/encoding); 4) Attacker can control the http_passwd value to construct malicious commands. The description of instruction addresses in the clue contains deviations, but the core data flow and dangerous operations are reproducible.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_R8000-V1.0.4.4_1.1.42.chk.extracted/squashfs-root/usr/sbin/httpd
-  Propagation:
+  Taint Propagation Path:
     - Source: uVar3 = sym.imp.acosNvramConfig_get(*0x5e0d4) at 0x5dfb8 (Get value of 'ver_check_ftp_password')
     - Step: *(puVar11 - 0x378) = uVar3; // Password stored at stack offset -0x378
     - Step: sym.imp.sprintf(iVar8, *0x5e0d8, *0x5e0b8, uVar5, ..., *(puVar11-0x378), ...); // Format string contains '-p %s', password at stack offset -0x378 serves as the third %s parameter
@@ -418,7 +418,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8000-V1.0.4.4_1.1.42/fw/_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/sbin/rc
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("PHYSDEVPATH") at 0x1e448 (result stored in r8)
     - Step: 0x1e468: mov r0, r8 --> Tainted env value loaded to r0
     - Step: 0x1e46c: bl fcn.0001ffc0 --> Enters function with tainted r0
@@ -427,23 +427,23 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw
     - Step: 0x20008: mov r1, sp --> Loads stack buffer address to r1
     - Step: 0x20010: rsb r2, r1, r2 --> Computes length (r2 = tainted_ptr - sp)
     - Sink: 0x20014: bl sym.imp.memcpy(r0, r1, r2) --> Attacker-controlled length in r2
-  Reason: 1) Taint source verification: The return value of getenv("PHYSDEVPATH") at 0x1e448 is passed via registers to fcn.0001ffc0; 2) Complete propagation path: The r2 tool confirms the tainted data flows through strstr→sscanf stack buffer→length calculation→memcpy, with no sanitization operations; 3) Exploitability: An attacker can precisely control the memcpy length parameter r2 (the length value calculated by the rsb r2,r1,r2 instruction is unvalidated) by manipulating the PHYSDEVPATH value.
+  Reason: 1) Taint source verification: The return value of getenv("PHYSDEVPATH") at 0x1e448 is passed via registers to fcn.0001ffc0; 2) Complete Taint Propagation Path path: The r2 tool confirms the tainted data flows through strstr→sscanf stack buffer→length calculation→memcpy, with no sanitization operations; 3) Exploitability: An attacker can precisely control the memcpy length parameter r2 (the length value calculated by the rsb r2,r1,r2 instruction is unvalidated) by manipulating the PHYSDEVPATH value.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/sbin/rc
-  Propagation:
+  Taint Propagation Path:
     - Source: sym.imp.acosNvramConfig_get("dhcp_resrv_ip") @ 0xa6c4 in fcn.0000a674 (r0 = tainted data)
     - Step: bl fcn.0000a584 @ 0xa6dc in fcn.0000a674 --> mov r0, r8; add r1, sp, 0x40; sub r1, r1, 0x40; bl fcn.0000a584 --> Pass tainted data in r0 to subroutine
     - Step: (fcn.0000a584) strcpy(dest, src) @ 0xa5dc --> mov r0, r8; bl sym.imp.strcpy --> Copy tainted data to stack buffer (r8 points to stack)
     - Step: sprintf(r5, "arp -s %s %s", r7+r4, sl+r4) @ 0xa728 in fcn.0000a674 --> add r2, r7, r4; ldr r1, str.arp__s__s__s; mov r0, r5; bl sym.imp.sprintf --> Format tainted stack data into command string
     - Sink: system(r5) @ 0xa740 in fcn.0000a674 --> mov r0, r5; bl sym.imp.system --> Execute command containing tainted data
-  Reason: Based on r2 evidence: 1) 0xa6c4 call obtains tainted data; 2) 0xa6dc passes taint to subroutine; 3) 0xa5dc copies to stack using strcpy; 4) 0xa728 formats tainted stack data into command; 5) 0xa740 executes unsanitized command. All steps have assembly evidence, forming a complete propagation chain. An attacker can inject arbitrary commands by controlling 'dhcp_resrv_ip'.
+  Reason: Based on r2 evidence: 1) 0xa6c4 call obtains tainted data; 2) 0xa6dc passes taint to subroutine; 3) 0xa5dc copies to stack using strcpy; 4) 0xa728 formats tainted stack data into command; 5) 0xa740 executes unsanitized command. All steps have assembly evidence, forming a complete Taint Propagation Path chain. An attacker can inject arbitrary commands by controlling 'dhcp_resrv_ip'.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/bin/iperf
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv('IPERF_BANDWIDTH') @ sym.Settings_ParseEnvironment (0xefe4)
     - Step: 0x0000efe4 bl sym.imp.getenv --> Environment variable value loaded into r0
     - Step: 0x0000eff8 bl sym.Settings_Interpret_char__char_const__thread_Settings_ --> Tainted value passed into function via r1
@@ -455,7 +455,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/arp_check
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get(*0xb2b0) at 0xbd8c (iz) --> Retrieves NVRAM variable 'wan_dns'
     - Step: strcpy(puVar28 - 0x198, uVar12) in fcn.0000b304 (pdg) --> Copies tainted 'wan_dns' to stack buffer at offset -0x198
     - Step: sprintf(puVar29, *0xb2b8, uVar12, uVar14) in fcn.0000b304 (pdg) --> Formats command with tainted data using format string at 0xbdc4 ("wan_gateway=%s wan_dns=%s")
@@ -465,7 +465,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: NVRAM variable 'fw_email_email_addr' read via sym.imp.acosNvramConfig_get at 0xa96c
     - Step: ldr r0, str.fw_email_email_addr @0xa968 --> Prepare argument for acosNvramConfig_get
     - Step: bl sym.imp.acosNvramConfig_get @0xa96c --> Return value in r0 contains tainted data
@@ -483,12 +483,12 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw
    0xa978: bl sym.imp.strcpy
 4. Control flow reachable (unconditional execution path)
 
-Deviation note: Actual taint source is at 0xa96c instead of 0x9bb4 in the clue, but the propagation essence is identical and the path is complete
+Deviation note: Actual taint source is at 0xa96c instead of 0x9bb4 in the clue, but the Taint Propagation Path essence is identical and the path is complete
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: NVRAM variable 'fw_email_email_addr' read via acosNvramConfig_get at 0xc110
     - Step: 0x0000c110      50019fe5       ldr r0, str.fw_email_email_addr --> Loads variable name address for NVRAM access
     - Step: 0x0000c114      6af4ffeb       bl sym.imp.acosNvramConfig_get --> Returns tainted data in r0
@@ -500,7 +500,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.acosNvramConfig_get @0xc0fc --> Retrieves tainted data from NVRAM and stores it in r0
     - Step: 0xc100: mov r1, r0 --> Transfers tainted data to r1
     - Step: 0xc104: ldr r0, [0xc2a4] --> Loads destination buffer address 0x154cc into r0
@@ -510,7 +510,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: NVRAM variable 'fw_email_email_time_day' read by sym.imp.acosNvramConfig_get at 0xbf8c
     - Step: bl sym.imp.atoi at 0xbf90 --> Converts string to integer (result in r0)
     - Step: mov r8, r0 at 0xbf94 --> Stores converted value in r8
@@ -522,7 +522,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.socket at 0x9c24 → File descriptor stored in r0
     - Step: 0x9c2c: mov sl, r0 → File descriptor transferred to sl register
     - Step: 0xadd8: mov r0, sl → Value from sl moved into r0 as memory address parameter
@@ -532,7 +532,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: fopen("/tmp/download_finish", "r") @ 0xb454 (confirmed via string @ 0xbe70)
     - Step: fread(auStack_514, 1, 0x400, file) --> Reads file content to stack buffer (r2 evidence: sym.imp.fread(puVar19 + -0x514,1,0x400,iVar2) @ 0xb454)
     - Step: strcat(iVar1, auStack_514) --> Concatenates to heap buffer (r2 evidence: sym.imp.strcat(iVar1,puVar19 + -0x514) @ 0xb454)
@@ -541,12 +541,12 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw
     - Step: memcpy(puVar27, tainted_data) --> Copies to new buffer (r2 evidence: loop copying pcVar3 to puVar27 @ 0x9b40 case 4)
     - Step: fcn.000094cc(socket, puVar27) --> Passes to network handler (r2 evidence: fcn.000094cc(*(iVar29+-0x14e0),puVar27) @ 0x9b40)
     - Sink: send(socket, puVar27, strlen(puVar27), 0) @ 0x94cc (r2 evidence: sym.imp.send(param_1,param_2,uVar2,0))
-  Reason: Full taint propagation path verified with r2: 1) File read confirmed via string @0xbe70; 2) Buffer concatenation shown in fcn.0000b454 pseudocode; 3) param_4 passed to fcn.00009b40 and stored locally; 4) Data copied in case 4 branch; 5) Direct pass to send() without sanitization. Attackers with write access to /tmp/download_finish can control sent data.
+  Reason: Full taint Taint Propagation Path path verified with r2: 1) File read confirmed via string @0xbe70; 2) Buffer concatenation shown in fcn.0000b454 pseudocode; 3) param_4 passed to fcn.00009b40 and stored locally; 4) Data copied in case 4 branch; 5) Direct pass to send() without sanitization. Attackers with write access to /tmp/download_finish can control sent data.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: fopen("/tmp/download_finish", "r") at fcn.0000b454 (0x0000b454)
     - Step: fread(auStack_514, 1, 0x400, file) --> File content read to stack buffer (offset 0x514)
     - Step: strcat(iVar1, auStack_514) --> Tainted data appended to heap buffer iVar1
@@ -559,7 +559,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw/_R8300-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: fopen('/tmp/download_finish', 'r') at 0xbc44 (fcn.0000b454)
     - Step: fread(puVar19 + -0x514, 1, 0x400, file_ptr) --> [Reads 1024 bytes to stack buffer]
     - Step: strcat(iVar1, puVar19 + -0x514) --> [Appends tainted data to heap buffer iVar1]
@@ -572,7 +572,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8300-V1.0.2.106_1.0.85/fw
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/sbin/rc
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("ACTION") @ 0x1e9ac: bl sym.imp.getenv --> Reads environment variable, contaminating r0
     - Step: 0x1e9b4: mov r2, r0 --> Tainted data transferred from r0 to r2
     - Step: 0x1e9bc: bl sym.imp.sprintf with r1="echo 'action = %s' > dev/console", r2=tainted --> Tainted data written to r4 buffer via format string
@@ -582,19 +582,19 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/sbin/rc
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.getenv("PHYSDEVDRIVER") @ 0x1e35c → Return value stored in sl register
     - Step: 0x1e4bc: mov r2, sl → Tainted data passed to sprintf parameter register
     - Step: 0x1e4c8: bl sym.imp.sprintf(r4, "%s%c%d") → Constructs device name and writes to r4 buffer
     - Step: 0x1e4d0: mov r2, r4 → Previous output used as new sprintf input
     - Step: 0x1e4d8: bl sym.imp.sprintf(r5, "/dev/%s") → Writes complete path to r5
     - Sink: 0x1e660: bl sym.imp.mknod(r5, ...) → Creates device node with user-controlled path
-  Reason: 1) Taint source confirmed: r2 command verifies string 'PHYSDEVDRIVER' referenced at 0x1e740; 2) Complete propagation path: Continuous transmission via registers sl→r2→r4→r2→r5→r0, key instructions verified step-by-step with pd command; 3) No sanitization evidence: No length checks/content filtering detected in the path; 4) Sink verified: Explicit mknod call at 0x1e660 with parameters from tainted path. Attacker can control environment variable to construct arbitrary device paths.
+  Reason: 1) Taint source confirmed: r2 command verifies string 'PHYSDEVDRIVER' referenced at 0x1e740; 2) Complete Taint Propagation Path path: Continuous transmission via registers sl→r2→r4→r2→r5→r0, key instructions verified step-by-step with pd command; 3) No sanitization evidence: No length checks/content filtering detected in the path; 4) Sink verified: Explicit mknod call at 0x1e660 with parameters from tainted path. Attacker can control environment variable to construct arbitrary device paths.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/sbin/rc
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("PHYSDEVPATH") @ 0x1e36c (r0=env_value)
     - Step: 0x1e46c: bl fcn.0001ffc0(r0, sp-0x364) --> Environment variable value passed to processing function
     - Step: 0x1da04: ldr r0, [var_1ch] @ fcn.0001d704 --> Loads tainted buffer address
@@ -606,29 +606,29 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/sbin/rc
-  Propagation:
+  Taint Propagation Path:
     - Source: sym.imp.nvram_get(iVar1) @ 0x16a84 (returns value in eax)
     - Step: mov pcVar12, eax @ 0x16a88 --> Stores tainted data in pcVar12
     - Step: snprintf(puVar15+0xfffffb00, *0x17808, pcVar12) @ 0x16b18 --> Formats tainted data into buffer
     - Sink: system(puVar15+0xfffffb00) @ 0x16bb8 --> Executes constructed command
-  Reason: Based on r2 evidence: 1) Actual source address 0x16a84 contains nvram_get call ('pd 1 @ 0x16a84' shows bl sym.imp.nvram_get) 2) Actual sink address 0x16bb8 contains system call 3) Propagation path confirmed through decompilation: tainted data flows from eax→pcVar12→snprintf input→buffer→system execution 4) Critical offset corrections: source address 0x16a48→0x16a84, sink address 0x16bc4→0x16bb8, snprintf address 0x16bb0→0x16b18 5) No evidence of sanitization operations, constituting a command injection vulnerability
+  Reason: Based on r2 evidence: 1) Actual source address 0x16a84 contains nvram_get call ('pd 1 @ 0x16a84' shows bl sym.imp.nvram_get) 2) Actual sink address 0x16bb8 contains system call 3) Taint Propagation Path path confirmed through decompilation: tainted data flows from eax→pcVar12→snprintf input→buffer→system execution 4) Critical offset corrections: source address 0x16a48→0x16a84, sink address 0x16bc4→0x16bb8, snprintf address 0x16bb0→0x16b18 5) No evidence of sanitization operations, constituting a command injection vulnerability
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/check_fw
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get('ver_check_ftp_username') at 0xa1b0
     - Step: 0xa1b0: bl sym.imp.acosNvramConfig_get --> r0 = tainted NVRAM value
     - Step: 0xa1b4: mov sb, r0 --> Tainted value stored in sb register
     - Step: 0xa1ec: mov r3, sb --> Tainted data loaded to r3 for sprintf argument
     - Step: 0xa210: bl sym.imp.sprintf(buffer, 'rm -f %s;ftpc -u %s...', '/tmp/firmwareCfg', r3) --> Tainted data embedded in command string
     - Sink: 0xa218: bl sym.imp.system(buffer) --> Executes command containing unvalidated tainted data
-  Reason: The complete taint propagation path has been confirmed by r2 evidence: 1) The taint source (acosNvramConfig_get) is identified at 0xa1b0; 2) The tainted data is directly propagated via registers to sprintf (0xa210); 3) The formatted command buffer is directly passed to system for execution (0xa218). There are no sanitization operations in the path, and all critical addresses have been verified through disassembly. An attacker controlling the NVRAM value as an authenticated user can lead to command injection.
+  Reason: The complete taint Taint Propagation Path path has been confirmed by r2 evidence: 1) The taint source (acosNvramConfig_get) is identified at 0xa1b0; 2) The tainted data is directly propagated via registers to sprintf (0xa210); 3) The formatted command buffer is directly passed to system for execution (0xa218). There are no sanitization operations in the path, and all critical addresses have been verified through disassembly. An attacker controlling the NVRAM value as an authenticated user can lead to command injection.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/check_fw
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.acosNvramConfig_get @0xa1bc --> Retrieves NVRAM variable 'ver_check_ftp_password'
     - Step: 0xa1c4: mov r7, r0 --> NVRAM value stored in register r7
     - Step: 0xa200: stm sp, {r7, ip} --> Tainted data r7 pushed onto stack as sprintf argument
@@ -639,7 +639,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/check_fw
-  Propagation:
+  Taint Propagation Path:
     - Source: sym.imp.acosNvramConfig_get(0xc108) @ 0xa094 --> Retrieves value of 'ver_check_ftp_username' from NVRAM into uVar2
     - Step: sym.imp.sprintf(puVar10-0x280, 0xc168, *0xa29c, uVar2) @ 0xa094 --> uVar2 is directly formatted with %s into command string
     - Sink: sym.imp.system(puVar10-0x280) @ 0xa094 --> Constructed command passed to system() for execution
@@ -648,7 +648,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/check_fw
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.acosNvramConfig_get @ 0xa1b0 → Retrieves NVRAM configuration value 'ver_check_ftp_username' into r0
     - Step: mov sb, r0 @ 0xa1b4 → Tainted value stored in register sb
     - Step: mov r3, sb @ 0xa1ec → Tainted value loaded into parameter register r3 for sprintf
@@ -659,7 +659,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/dlnad
-  Propagation:
+  Taint Propagation Path:
     - Source: sym.imp.acosNvramConfig_get("iserver_remote_passcode") at 0x98fc → Tainted NVRAM value in r0
     - Step: 0x9904: mov r2, r0 → Tainted value moved to r2
     - Step: 0x990c: bl sym.imp.sprintf(r7, str.echo_NoDeviceName, r2) → Tainted data formatted into buffer r7
@@ -670,7 +670,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/dlnad
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get("songs_file_path") at 0x9518
     - Step: ldr r1, str.______s ; mov r2, r5 ; mov r3, r4 ; bl sym.imp.sscanf --> Tainted return value(r0) passed to sscanf, parsing into stack buffers r5(sp-0xc4) and r4(sp-0x44)
     - Step: ldr r1, str.cp__tmp_media_nand_daapd__s__s ; mov r2, r4 ; mov r0, sp ; bl sym.imp.sprintf --> Tainted buffers(r4/r5) embedded in command string constructed at sp
@@ -680,7 +680,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/dlnad
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get("songs_file_path") at 0x9518
     - Step: 0x9528: bl sym.imp.sscanf(r0, "%[^@]@%s", sp-0xc4, sp-0x44) → Taints memory at sp-0x44 (r4)
     - Step: 0x9538: cmp r0, 0 → Branch taken when acosNvramConfig_match returns non-zero (required to reach sink)
@@ -693,18 +693,18 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/dlnad
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get("iserver_remote_passcode") @ 0x98f8: ldr r0, str.iserver_remote_passcode; bl sym.imp.acosNvramConfig_get --> Retrieves NVRAM value into r0
     - Step: 0x9904: mov r2, r0 --> Tainted data transferred from r0 to r2
     - Step: 0x990c: bl sym.imp.sprintf @ Format string: "echo \"NoDeviceName\r\n%s\" > /tmp/shares/forked_daapd.remote" --> Tainted data r2 embedded into command buffer via %s
     - Step: 0x9910: mov r0, r7 --> Constructed command buffer address loaded into r0
     - Sink: 0x9914: bl sym.imp.system(r0) --> Executes system command containing tainted data
-  Reason: Verified based on r2: 1) Sequence 0x98f8-0x9904 confirms taint source and propagation 2) sprintf format string contains %s directly receiving external data (0x9e20) 3) No filtering instructions (pd analysis shows no sanitization calls) 4) Complete path: NVRAM value → register transfer → command concatenation → system execution. Attacker controlling NVRAM can inject arbitrary commands.
+  Reason: Verified based on r2: 1) Sequence 0x98f8-0x9904 confirms taint source and Taint Propagation Path 2) sprintf format string contains %s directly receiving external data (0x9e20) 3) No filtering instructions (pd analysis shows no sanitization calls) 4) Complete path: NVRAM value → register transfer → command concatenation → system execution. Attacker controlling NVRAM can inject arbitrary commands.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: NVRAM variables 'ipv6_wan_ipaddr' and 'ipv6_wan_length' via acosNvramConfig_get
     - Step: 0x9c38: mov r6, r0 --> Stores 'ipv6_wan_ipaddr' in r6
     - Step: 0x9c3c: ldr r0, str.ipv6_wan_length --> Loads variable name for 'ipv6_wan_length'
@@ -718,7 +718,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.0.85.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: Network packet input (Option Type 5) at function fcn.00009534 (0x9534)
     - Step: uVar17 = *(pcVar8 + 4) --> Read 4 bytes of uncontrolled data from packet (pcVar8+4)
     - Step: uVar17 = (uVar17 << 0x18) | ((uVar17 >> 8 & 0xff) << 0x10) | ((uVar17 >> 0x10 & 0xff) << 8) | (uVar17 >> 0x18) --> Byte swap operation on tainted data
@@ -729,7 +729,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8500/_R8500-V1.0.2.106_1.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8900-V1.0.2.40/fw/_R8900-V1.0.2.40.img.extracted/squashfs-root/usr/bin/tar
-  Propagation:
+  Taint Propagation Path:
     - Source: Command-line argument argv[3] at index 3
     - Step (fcn.0000bd80): fcn.0001dc0c(*(*(puVar27-0x30)+3*4), ...) @ loop body --> Passes argv[3] as first argument (r0) via stack offset -0x30
     - Step (fcn.0001dc0c @ 0x1dc6c): str r6, [r3, 4] --> Stores tainted argv[3] pointer to global struct (r6 holds argv[3] from r0)
@@ -742,19 +742,19 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8900-V1.0.2.40/fw/_R8900-
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8900-V1.0.2.40/fw/_R8900-V1.0.2.40.img.extracted/squashfs-root/usr/sbin/mke2fs
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("MKE2FS_SYNC") at 0xe030: bl sym.imp.getenv
     - Step: 0xe040: bl sym.imp.atoi --> Converts env value to integer (r0=return value)
     - Step: 0xe04c: str r0, [r3] with r3=0x25d88 (obj.sync_kludge) --> Tainted value stored in global variable
     - Step: 0xc7f4: ldr r1, [r3] (r3=0x25d88) --> Loads tainted value from sync_kludge to r1
     - Step: 0xc7f8: cmp r1, 0; 0xc7fc: beq 0xc820 --> Conditional jump based on tainted value
     - Sink: 0xc808: bl sym.imp.sync --> Executes sync() when tainted value ≠ 0
-  Reason: Radare2 evidence confirms the complete propagation chain: 1) Environment variable value is converted by atoi and stored in global variable sync_kludge (0x25d88) 2) This value is loaded into r1 and controls conditional branching 3) Triggers parameterless sync() system call when the value is non-zero. An attacker can force synchronization operations by setting MKE2FS_SYNC=1, posing a denial of service risk.
+  Reason: Radare2 evidence confirms the complete Taint Propagation Path chain: 1) Environment variable value is converted by atoi and stored in global variable sync_kludge (0x25d88) 2) This value is loaded into r1 and controls conditional branching 3) Triggers parameterless sync() system call when the value is non-zero. An attacker can force synchronization operations by setting MKE2FS_SYNC=1, posing a denial of service risk.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8900-V1.0.2.40/fw/_R8900-V1.0.2.40.img.extracted/squashfs-root/usr/sbin/mke2fs
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("HOME") at 0x111c8 in fcn.00011168
     - Step: 0x00011214: bl sym.imp.strcpy (r1=r7) --> Copies HOME value to heap buffer
     - Step: 0x00011220: bl sym.imp.strcat (r0=r8, r1=r5+1) --> Appends user argument to form full path
@@ -766,7 +766,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8900-V1.0.2.40/fw/_R8900-
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8900-V1.0.2.40/fw/_R8900-V1.0.2.40.img.extracted/squashfs-root/usr/sbin/mke2fs
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("MKE2FS_FIRST_META_BG") @0xf940 → r0 (environment variable value)
     - Step: 0xf948: str r0, [sp, 0x60] → stores tainted pointer on stack
     - Step: 0xfd9c: ldr r0, [sp, 0x60] → reloads tainted pointer to r0
@@ -776,7 +776,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8900-V1.0.2.40/fw/_R8900-
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8900-V1.0.2.40/fw/_R8900-V1.0.2.40.img.extracted/squashfs-root/usr/sbin/mke2fs
-  Propagation:
+  Taint Propagation Path:
     - Source: sym.imp.getenv @0x12780 → r0=getenv("E2FSPROGS_UNDO_DIR")
     - Step: 0x12734: bl fcn.000136a4 → Propagates tainted r0 to copy function
     - Step: 0x136ac: strncpy(iVar1, param_1, iVar2) → Copies tainted data without sanitization (src=environment variable value)
@@ -788,7 +788,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/R8900-V1.0.2.40/fw/_R8900-
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.chk.extracted/squashfs-root/sbin/acos_service
-  Propagation:
+  Taint Propagation Path:
     - Source: ldr r0, [str.wan_dns1] @ 0xf548 --> Loads user-controlled 'wan_dns1' value from NVRAM
     - Step: 0xef50: mov r1, r0 --> Tainted data moved to r1 for copying
     - Step: 0xef54: add r0, sp, 4 --> Sets destination address to stack buffer [sp+4] (i.e., [ebp-0x3ac])
@@ -805,37 +805,37 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.c
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.chk.extracted/squashfs-root/sbin/acos_service
-  Propagation:
+  Taint Propagation Path:
     - Source: uVar2 = sym.imp.acosNvramConfig_get(*0x1d9dc) @ 0x1d8b8+0xac (Parameter verification: ps @ 0x1d9dc='ipv6_static_ip')
     - Step: sym.imp.strcpy(puVar4 + -0x100, uVar2) --> Tainted data directly copied to stack buffer
     - Step: sym.imp.sprintf(puVar4 + -0x200, *0x1d9e0, puVar4 + -0x100) --> Command construction (Verification: ps @ *0x1d9e0='route -A inet6 add 2000::/3 gw ::%s dev sit0')
     - Sink: sym.imp.system(puVar4 + -0x200) --> System command execution with tainted parameters
-  Reason: Complete propagation path rigorously verified by r2 tool: 1) Taint source address 0x1d9dc confirmed to point to 'ipv6_static_ip' 2) Format string address 0x1d9e0 confirmed to match the clue 3) Decompilation of function fcn.0001d8b8 shows tainted data flows from get()→strcpy()→sprintf()→system() without any sanitization. Attackers can inject arbitrary commands by controlling the ipv6_static_ip value.
+  Reason: Complete Taint Propagation Path path rigorously verified by r2 tool: 1) Taint source address 0x1d9dc confirmed to point to 'ipv6_static_ip' 2) Format string address 0x1d9e0 confirmed to match the clue 3) Decompilation of function fcn.0001d8b8 shows tainted data flows from get()→strcpy()→sprintf()→system() without any sanitization. Attackers can inject arbitrary commands by controlling the ipv6_static_ip value.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.chk.extracted/squashfs-root/sbin/acos_service
-  Propagation:
+  Taint Propagation Path:
     - Source: fopen("/proc/mtd") @ 0xd7dc → fgets(buffer=r4, size=0x1000) @ 0xd800
     - Step: sscanf(r4, "mtd%d:", ...) @ 0xd818 → Parses integer from file content
     - Step: snprintf(r4, 0x1000, "/dev/mtdblock%d", parsed_integer) @ 0xd84c → Formats device path using tainted data
     - Sink: mount(r4, "/tmp/media/nand", "jffs2", 0, 0) @ 0xd88c → Untainted device path passed to mount()
-  Reason: Complete taint propagation path: 1) Content read by fgets from /proc/mtd is stored in r4; 2) sscanf parses integer from r4 and stores it on the stack; 3) snprintf loads this integer from the stack, formats a new path into the original r4 buffer; 4) mount directly uses r4 as the source device parameter. Key evidence: r4 consistently acts as a data carrier (0xd7fc mov r0,r4 → 0xd844 mov r0,r4 → 0xd884 mov r0,r4) with no sanitization operations. Attackers can control the device path by tampering with /proc/mtd.
+  Reason: Complete taint Taint Propagation Path path: 1) Content read by fgets from /proc/mtd is stored in r4; 2) sscanf parses integer from r4 and stores it on the stack; 3) snprintf loads this integer from the stack, formats a new path into the original r4 buffer; 4) mount directly uses r4 as the source device parameter. Key evidence: r4 consistently acts as a data carrier (0xd7fc mov r0,r4 → 0xd844 mov r0,r4 → 0xd884 mov r0,r4) with no sanitization operations. Attackers can control the device path by tampering with /proc/mtd.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.chk.extracted/squashfs-root/sbin/acos_service
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get("friendly_name") at 0xd704 --> NVRAM input taint stored in r0
     - Step: 0xd710: mov r3, r0 --> Tainted data transferred to register r3
     - Step: 0xd718: ldr r1, [str._s___s___s] ; 0xd71c: mov r0, r4 ; 0xd724: bl sym.imp.sprintf --> r3 embedded as sprintf parameter into r4 buffer
     - Sink: 0xd728: mov r0, r4 ; 0xd72c: bl sym.imp.system --> Tainted buffer directly executes system command
-  Reason: Radare2 instruction-level verification confirms: 1) Existence of taint source acosNvramConfig_get call; 2) Taint propagation through registers r0→r3; 3) r3 embedded as unsanitized parameter in command string during sprintf call; 4) Resulting buffer directly passed to system for execution. The entire process lacks filtering or sanitization, allowing attackers to inject arbitrary commands by tampering with NVRAM.
+  Reason: Radare2 instruction-level verification confirms: 1) Existence of taint source acosNvramConfig_get call; 2) Taint Taint Propagation Path through registers r0→r3; 3) r3 embedded as unsanitized parameter in command string during sprintf call; 4) Resulting buffer directly passed to system for execution. The entire process lacks filtering or sanitization, allowing attackers to inject arbitrary commands by tampering with NVRAM.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.chk.extracted/squashfs-root/sbin/acos_service
-  Propagation:
+  Taint Propagation Path:
     - Source: Environment variable IFNAME controlled by attacker during PPP connection
     - Step: 0x17a70: ldr r0, str.IFNAME ; [0x25654:4]=0x414e4649 ; Load address of 'IFNAME' string
     - Step: 0x17a74: bl sym.imp.getenv ; Get environment variable value to r0
@@ -844,24 +844,24 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.c
     - Step: 0x17c0c: bl fcn.000106c4 ; Pass tainted data as argument
     - Step: 0x107c0: bl sym.imp.sprintf ; Format string (contains tainted data)
     - Step: 0x107c8: bl sym.imp.system ; Execute command containing tainted input
-  Reason: Verification confirms complete propagation path: 1) IFNAME environment variable obtained via getenv (0x17a74) 2) Value passed through registers (r6→r0) 3) Passed as argument to fcn.000106c4 (0x17c0c) 4) Directly used in sprintf formatting in subroutine (0x107c0) 5) Formatted output immediately used in system call (0x107c8). Decompilation evidence shows tainted data (param_1) is directly used in command construction without sanitization, allowing attackers to achieve command injection by maliciously setting IFNAME.
+  Reason: Verification confirms complete Taint Propagation Path path: 1) IFNAME environment variable obtained via getenv (0x17a74) 2) Value passed through registers (r6→r0) 3) Passed as argument to fcn.000106c4 (0x17c0c) 4) Directly used in sprintf formatting in subroutine (0x107c0) 5) Formatted output immediately used in system call (0x107c8). Decompilation evidence shows tainted data (param_1) is directly used in command construction without sanitization, allowing attackers to achieve command injection by maliciously setting IFNAME.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.chk.extracted/squashfs-root/usr/bin/iperf
-  Propagation:
+  Taint Propagation Path:
     - Source: sym.imp.getenv('IPERF_CLIENT') @ 0xefe4 (r0 = getenv return value)
     - Step: mov r1, r0 @ 0xefe8 --> Stores env value in r1 (Settings_ParseEnvironment)
     - Step: bl sym.Settings_Interpret @ 0xeff8 --> Passes tainted r1 as second arg (env string)
     - Step: case 0x1c (28): mov r0, r1 @ 0xe9ac --> Tainted env moved to r0 (Settings_Interpret)
     - Step: bl sym.Settings_GetUpperCaseArg @ 0xe9b4 --> Passes tainted r0 as source arg
     - Sink: bl sym.imp.strcpy @ 0xe494 --> Copies tainted data to stack buffer (Settings_GetUpperCaseArg)
-  Reason: 1) Taint source: Environment variable IPERF_CLIENT is fully controllable 2) Propagation path: Through r1 register from Settings_ParseEnvironment(0xefe8)→Settings_Interpret(0xe9ac)→Settings_GetUpperCaseArg(0xe494) 3) Sink verification: strcpy destination is stack buffer (sp+0x104, 260 bytes) 4) No sanitization: No length checks or sanitization operations in the path 5) Address confirmation: All key instructions verified to exist through r2 validation
+  Reason: 1) Taint source: Environment variable IPERF_CLIENT is fully controllable 2) Taint Propagation Path path: Through r1 register from Settings_ParseEnvironment(0xefe8)→Settings_Interpret(0xe9ac)→Settings_GetUpperCaseArg(0xe494) 3) Sink verification: strcpy destination is stack buffer (sp+0x104, 260 bytes) 4) No sanitization: No length checks or sanitization operations in the path 5) Address confirmation: All key instructions verified to exist through r2 validation
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.chk.extracted/squashfs-root/usr/local/samba/nmbd
-  Propagation:
+  Taint Propagation Path:
     - Source: Network packet received in sym.wins_process_name_registration_request at 0x1ac54: ldr r6, [r1, 0x2c] --> Load tainted field from packet structure to r6
     - Step: 0x1ad48: mov r1, r6 --> Move tainted r6 to arg register r1 for function call
     - Step: 0x1ad54: bl fcn.0001a194 --> Call subfunction with tainted r1 as argument
@@ -876,7 +876,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.c
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.chk.extracted/squashfs-root/usr/sbin/zip
-  Propagation:
+  Taint Propagation Path:
     - Source: ARGV-derived string in r0 @ sym.ziptyp entry (0x00014aa4)
     - Step: 0x00014aa8: mov r5, r0 --> Tainted ARGV data saved to r5
     - Step: 0x00014ac0: mov r1, r5 --> Sets src parameter for strcpy (taint preserved)
@@ -886,38 +886,38 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.c
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_R7900-V1.0.1.26_10.0.23.chk.extracted/squashfs-root/usr/sbin/zip
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.getenv @ 0x22a68 (Get ZIPOPT environment variable)
     - Step: mov r6, r1 @ sym.add_filter:0xa1f4 → Tainted data stored in r6
     - Step: ldrb r3, [r6, 1] @ 0xa2a4 → Check second character (skipping '@')
     - Step: add r0, r6, 1 @ 0xa2b0 → Construct filename pointer (r6+1)
     - Sink: bl sym.imp.fopen @ 0xa2b8 → Tainted path passed to file operation
-  Reason: Based on r2 evidence chain: 1) ZIPOPT environment variable obtained via getenv at 0x22a68; 2) Tainted data passed through r1 register to r6 in sym.add_filter; 3) 0xa2a4-a2b0 directly uses tainted data to construct path (skipping '@' character); 4) 0xa2b8 passes unsanitized path to fopen. The entire propagation path lacks filtering operations, allowing attackers to exploit '@file' syntax for path traversal.
+  Reason: Based on r2 evidence chain: 1) ZIPOPT environment variable obtained via getenv at 0x22a68; 2) Tainted data passed through r1 register to r6 in sym.add_filter; 3) 0xa2a4-a2b0 directly uses tainted data to construct path (skipping '@' character); 4) 0xa2b8 passes unsanitized path to fopen. The entire Taint Propagation Path path lacks filtering operations, allowing attackers to exploit '@file' syntax for path traversal.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500Lv2-V1.2.0.46_40.0.86.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: param_2 (forged ICMPv6 packet) in sym.process @ 0x00400f64
     - Step: 0x00401230: lbu v1, 2(s0) --> Read prefix length (1 byte) from packet option offset 2 without validation
     - Step: 0x004017a4: sprintf(auStack_160, "ifconfig %s add %s/%d", ..., unaff_s7) --> Tainted prefix length (unaff_s7) inserted as integer parameter
     - Sink: Call to system(auStack_160) @ 0x004017b0 (estimated) --> Executes command with unvalidated tainted data
-  Reason: Radare2 evidence confirms: 1) Packet data (param_2) is read at 0x00401230 without sanitization; 2) Tainted byte (unaff_s7) flows directly into sprintf format string at 0x4017a4 as %d parameter; 3) Resulting buffer is passed to system() via function pointer call (**(iVar14 + -0x7f28)). No validation or sanitization observed in the propagation path.
+  Reason: Radare2 evidence confirms: 1) Packet data (param_2) is read at 0x00401230 without sanitization; 2) Tainted byte (unaff_s7) flows directly into sprintf format string at 0x4017a4 as %d parameter; 3) Resulting buffer is passed to system() via function pointer call (**(iVar14 + -0x7f28)). No validation or sanitization observed in the Taint Propagation Path path.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500v2-V1.2.0.46_40.0.86.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: Forged ICMPv6 Router Advertisement packet (param_2) is passed into the sym.process function (Evidence: Decompiled function prototype void sym.process(..., char *param_2, ...))
     - Step: unaff_s7 = pcVar7[2] --> The prefix length (single byte) is directly obtained from the packet option without validation (Evidence: Direct assignment when processing option type 3 near decompiled code 0x00401298)
     - Step: sprintf(auStack_160, "ifconfig %s add %s/%d", global_var, puStack_5c, unaff_s7) --> Tainted data is used for command concatenation (Evidence: 1) String constant exists at 0x004031f0 2) Decompilation shows sprintf call uses unaff_s7)
     - Sink: system(auStack_160) --> Executes a command containing tainted data (Evidence: 1) Imported function system@0x00402cb0 2) Direct call in decompiled code)
-  Reason: Path logic exists but address evidence is insufficient: 1) The taint propagation path is clear in the decompiled code (param_2 → option processing → unaff_s7 → sprintf → system); 2) Key format string and dangerous function calls were found; 3) However, the specific addresses provided as clues (0x0040122c/0x00401500/0x00401510) do not match the actual instructions (e.g., 0x00401500 is actually an lw instruction); 4) The actual sprintf call is at 0x004017b8, and the system call is at 0x004017c0.
+  Reason: Path logic exists but address evidence is insufficient: 1) The taint Taint Propagation Path path is clear in the decompiled code (param_2 → option processing → unaff_s7 → sprintf → system); 2) Key format string and dangerous function calls were found; 3) However, the specific addresses provided as clues (0x0040122c/0x00401500/0x00401510) do not match the actual instructions (e.g., 0x00401500 is actually an lw instruction); 4) The actual sprintf call is at 0x004017b8, and the system call is at 0x004017c0.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500v2-V1.2.0.46_40.0.86.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: User input of command line argument '-I' in the main function
     - Step: 0x00402b14: addiu a0, s6, 0x3688 --> Sets target address to global buffer (s6=0x440000, address 0x443688)
     - Step: 0x00402b10: jalr t9 (strcpy) --> Copies user input to global buffer without length check
@@ -930,7 +930,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500v2-V1.2.0.46_40.0.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500Lv2-V1.2.0.46_40.0.86.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get("ipv6_proto") @ 0x00400df0 (via jalr t9)
     - Step: 0x00400e04: move a1, v0 --> Tainted return value moved to strcpy source argument
     - Sink: 0x00400e08: jalr t9 @ sym.imp.strcpy --> Unchecked data copied to buffer
@@ -939,7 +939,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500Lv2-V1.2.0.46_40.0
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500v2-V1.2.0.46_40.0.86.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get(*(iVar5 + -0x7fe4) + 0x2f34) @ condition branch in fcn.00400dbc
     - Step: uVar1 = (*pcVar3)(global_base + 0x2f34) --> acosNvramConfig_get returns tainted value in uVar1 (v0)
     - Step: (*pcVar4)(param_1, uVar1) --> Tainted value passed directly to strcpy as source argument
@@ -949,7 +949,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500v2-V1.2.0.46_40.0.
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500Lv2-V1.2.0.46_40.0.86.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: lw t0, 0x10(s0); sw t0, 0x68(sp); lw a0, 4(a1); sw a0, 0x6c(sp); lw a1, 8(a1); sw a1, 0x70(sp); lw a3, 0xc(a1); sw a3, 0x74(sp) @ 0x004012a8-0x004012b4 --> Copies 16 bytes from packet+0x20 to stack (sp+0x68)
     - Step: addiu a1, sp, 0x68; jalr t9 @ sym.imp.inet_ntop @ 0x00401758 --> Converts binary IPv6 address to string at sp+0x170
     - Step: lw a3, (var_584h); jalr t9 @ sym.imp.sprintf @ 0x0040179c --> Formats command string 'ifconfig %s add %s/%d' using tainted IPv6 string
@@ -959,7 +959,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500Lv2-V1.2.0.46_40.0
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500v2-V1.2.0.46_40.0.86.chk.extracted/squashfs-root/usr/sbin/rtsol
-  Propagation:
+  Taint Propagation Path:
     - Source: acosNvramConfig_get("ipv6_wan_ipaddr") @0x0040189c → v0
     - Step: 0x004018a8: move s2, v0 → Tainted value stored in s2
     - Source: acosNvramConfig_get("ipv6_wan_length") @0x004018b0 → v0
@@ -967,12 +967,12 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_WNR3500v2-V1.2.0.46_40.0.
     - Step: 0x004018d0: la a1, str.autoconfig_wan_up__s__s__s; move a3, s2; lw a2, 0x3688(s5) → Preparing sprintf parameters (a3=s2, stack-passed parameter var_10h)
     - Step: 0x004018e4: jalr t9 @ sym.imp.sprintf → Concatenating command (containing two tainted values)
     - Sink: 0x004018fc: jalr t9 @ sym.imp.system → Executing tainted command
-  Reason: Taint propagation path verification failure reason: The NVRAM value obtained at the clue-specified source point 0x00401218 is not used for the sink (only used for prefix matching check). The actual vulnerability path originates from calls at 0x0040189c and 0x004018b0. Their return values are directly concatenated by sprintf and passed to system without any filtering measures, constituting a command injection vulnerability.
+  Reason: Taint Taint Propagation Path path verification failure reason: The NVRAM value obtained at the clue-specified source point 0x00401218 is not used for the sink (only used for prefix matching check). The actual vulnerability path originates from calls at 0x0040189c and 0x004018b0. Their return values are directly concatenated by sprintf and passed to system without any filtering measures, constituting a command injection vulnerability.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_XR500-V2.1.0.4.img.extracted/squashfs-root/www/cgi-bin/proccgi
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("QUERY_STRING") at 0x88dc → r0 = tainted_data
     - Step: 0x88e0: subs r5, r0, 0 → [Tainted data stored in r5]
     - Step: 0x88ec: b fcn.000087c8 → [Tainted data passed to subroutine via r5]
@@ -983,7 +983,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_XR500-V2.1.0.4.img.extrac
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_XR500-V2.1.0.4.img.extracted/squashfs-root/www/cgi-bin/proccgi
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("CGI_POST_TMPFILE") at 0x882c → r0=tainted_path
     - Step: 0x8830: ldr r1, [0x8d04] → [r1="r" (read-only mode)]
     - Step: 0x8834: bl sym.imp.fopen → [Tainted path (r0) directly used as filename parameter]
@@ -993,18 +993,18 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_XR500-V2.1.0.4.img.extrac
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_XR500-V2.1.0.4.img.extracted/squashfs-root/www/cgi-bin/proccgi
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("CGI_POST_TMPFILE") at 0x882c → returns user-controlled path in r0
     - Step: fopen(r0, "r") at 0x8834 → opens user-controlled file (evidence: `bl sym.imp.fopen` @0x8834)
     - Step: fread(ptr, size, nmemb, stream) at 0x8910 → returns bytes read in r0 (evidence: `bl sym.imp.fread` @0x8910)
     - Step: mov r2, r0 at 0x8918 → tainted value moved to r2 (evidence: `mov r2, r0` @0x8918)
     - Sink: fprintf(stderr, "proccgi -- error reading post data, %d bytes read, %d expected\n", r2, r4) at 0x8930 → tainted r2 passed (evidence: `bl sym.imp.fprintf` @0x8930)
-  Reason: Core propagation path validated: 1) Environment variable source exists; 2) File open/read operations directly use tainted values; 3) fread return value is passed directly via registers to fprintf's format parameter. Address offset does not affect path continuity. Attacker can control file path → manipulate bytes read → inject into formatted string output.
+  Reason: Core Taint Propagation Path path validated: 1) Environment variable source exists; 2) File open/read operations directly use tainted values; 3) fread return value is passed directly via registers to fprintf's format parameter. Address offset does not affect path continuity. Attacker can control file path → manipulate bytes read → inject into formatted string output.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_XR500-V2.1.0.4.img.extracted/squashfs-root/www/cgi-bin/proccgi
-  Propagation:
+  Taint Propagation Path:
     - Source: fread(stdin) at 0x88b0 (bl sym.imp.fread), returns bytes read in r0
     - Step: 0x88b8: mov r2, r0 --> Stores tainted fread return value in r2
     - Step: 0x88bc: cmp r0, r4; blt 0x88f0 --> Conditional jump based on tainted value
@@ -1015,7 +1015,7 @@ Binary Path: /media/Elements/karonte/NETGEAR/analyzed/_XR500-V2.1.0.4.img.extrac
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/TP_Link/analyzed/TD_W9970_V1_150831/_TD-W9970v1_0.9.1_2.5_up_boot_2015-08-31_17.13.22.bin.extracted/squashfs-root/sbin/hotplug
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("DEVPATH") in sym.hotplug_storage_mount at 0x406934
     - Step: 0x4069b4: jal fcn.00401030 --> Passes DEVPATH string to function
     - Step: 0x4012c0: lw v0, sym.imp.sscanf; move t9, v0; jalr t9 --> Parses integer from DEVPATH (format: "/class/scsi_host/host%%d")
@@ -1026,7 +1026,7 @@ Binary Path: /media/Elements/karonte/TP_Link/analyzed/TD_W9970_V1_150831/_TD-W99
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/TP_Link/analyzed/TD_W9970_V1_150831/_TD-W9970v1_0.9.1_2.5_up_boot_2015-08-31_17.13.22.bin.extracted/squashfs-root/sbin/hotplug
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("DEVPATH") at 0x40693c in sym.hotplug_storage_mount
     - Step: 0x406948: sw v0, (var_24h) --> DEVPATH pointer stored in stack
     - Step: 0x4069ac: lw a0, (var_24h) --> Load DEVPATH pointer into a0 register
@@ -1037,7 +1037,7 @@ Binary Path: /media/Elements/karonte/TP_Link/analyzed/TD_W9970_V1_150831/_TD-W99
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/TP_Link/analyzed/TD_W9970_V1_150831/_TD-W9970v1_0.9.1_2.5_up_boot_2015-08-31_17.13.22.bin.extracted/squashfs-root/sbin/hotplug
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("DEVPATH") at 0x0040693c in sym.hotplug_storage_mount (v0 = returned pointer)
     - Step: 0x00406948: sw v0, (var_24h) --> DEVPATH pointer stored on stack
     - Step: 0x004069ac: lw a0, (var_24h) --> Load DEVPATH pointer into argument register a0
@@ -1051,7 +1051,7 @@ Binary Path: /media/Elements/karonte/TP_Link/analyzed/TD_W9970_V1_150831/_TD-W99
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/TP_Link/analyzed/TD_W9970_V1_150831/_TD-W9970v1_0.9.1_2.5_up_boot_2015-08-31_17.13.22.bin.extracted/squashfs-root/sbin/hotplug
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("DEVPATH") @ sym.hotplug_storage_mount+0x11c (0x406934)
     - Step: 0x406948: sw v0, (var_24h) --> Stores environment variable pointer on stack
     - Step: 0x4069ac: lw a0, (var_24h) --> Loads DEVPATH pointer into argument register
@@ -1063,7 +1063,7 @@ Binary Path: /media/Elements/karonte/TP_Link/analyzed/TD_W9970_V1_150831/_TD-W99
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/TP_Link/analyzed/TD_W9970_V1_150831/_TD-W9970v1_0.9.1_2.5_up_boot_2015-08-31_17.13.22.bin.extracted/squashfs-root/sbin/hotplug
-  Propagation:
+  Taint Propagation Path:
     - Source: sym.imp.getenv("DEVPATH") at 0x40693c (v0 contaminated)
     - Step: 0x406940: sw v0, (var_24h) --> Stores tainted value to stack
     - Step: 0x40694c: lw a0, (var_24h) --> Loads tainted value to argument register
@@ -1072,24 +1072,24 @@ Binary Path: /media/Elements/karonte/TP_Link/analyzed/TD_W9970_V1_150831/_TD-W99
     - Step: 0x4016a4: lw v0, (arg_5e0h) --> Reloads tainted value
     - Step: 0x4016b0: move a1, v0 --> Moves tainted value to strcpy source
     - Sink: 0x4016bc: jal sym.imp.strcpy --> Copies to fixed-size stack buffer (fp+0x38)
-  Reason: Verification confirmed: 1) getenv call exists and stores to stack; 2) Tainted value is passed into function via a0; 3) Function explicitly saves the argument to stack (arg_5e0h) and reloads it; 4) Ultimately passed as source argument to strcpy. Buffer is located on stack (fp+0x38) with no length check. Address deviation reason: Addresses 0x4016a0/0x4016a8 in the clue should be 0x4016a4/0x4016bc, but the essential propagation path holds.
+  Reason: Verification confirmed: 1) getenv call exists and stores to stack; 2) Tainted value is passed into function via a0; 3) Function explicitly saves the argument to stack (arg_5e0h) and reloads it; 4) Ultimately passed as source argument to strcpy. Buffer is located on stack (fp+0x38) with no length check. Address deviation reason: Addresses 0x4016a0/0x4016a8 in the clue should be 0x4016a4/0x4016bc, but the essential Taint Propagation Path path holds.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/TP_Link/analyzed/TD_W9970_V1_150831/_TD-W9970v1_0.9.1_2.5_up_boot_2015-08-31_17.13.22.bin.extracted/squashfs-root/sbin/hotplug
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("DEVPATH") @ 0x406e7c in sym.hotplug_storage_umount
     - Step: 0x406eec: lw a0, (var_24h) --> Load DEVPATH pointer into argument register
     - Step: 0x406ef4: jal fcn.00401030 --> Call subroutine passing the tainted pointer
     - Step: [fcn.00401030] 0x4016a4: lw v0, (arg_5e0h) --> Load DEVPATH pointer from argument position
     - Step: [fcn.00401030] 0x4016b0: move a1, v0 --> Move tainted data into strcpy source argument
     - Sink: [fcn.00401030] 0x4016bc: jal sym.imp.strcpy --> Copy to stack buffer (fp+0x38)
-  Reason: Verification passed: 1) A complete propagation path exists from getenv("DEVPATH") to strcpy 2) All key addresses confirmed valid via r2 3) Decompilation shows no bounds checking (target buffer fp+0x38 has fixed size) 4) Tainted data is passed directly as strcpy source argument without sanitization during propagation. Meets the conditions for a stack overflow vulnerability.
+  Reason: Verification passed: 1) A complete Taint Propagation Path path exists from getenv("DEVPATH") to strcpy 2) All key addresses confirmed valid via r2 3) Decompilation shows no bounds checking (target buffer fp+0x38 has fixed size) 4) Tainted data is passed directly as strcpy source argument without sanitization during Taint Propagation Path. Meets the conditions for a stack overflow vulnerability.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_multi_TD01.bin.extracted/squashfs-root/bin/netctrl
-  Propagation:
+  Taint Propagation Path:
     - Source: 0x130b4: ldr r0, [pc, ...]; bl sym.imp.envram_get --> Reads NVRAM variable 'adv.virtualser.list1', result stored in stack buffer
     - Step: 0x13130: bl sym.imp.sscanf --> Parses tainted data into stack buffer src@fp-0x180
     - Sink: 0x13214-0x13220: sub r3, src; mov r1, r3; bl sym.imp.strcpy --> Copies tainted data to fixed 0x10-byte stack buffer
@@ -1098,7 +1098,7 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_multi_TD01.bin.extracted/squashfs-root/bin/netctrl
-  Propagation:
+  Taint Propagation Path:
     - Source: GetValue('wans.wanwebip') @0x13610 (fcn.00013568) → NVRAM value stored in stack buffer
     - Step: 0x13658: mov r0, r2 → Destination address set to [param_1 + 0xc] (stack buffer offset)
     - Step: 0x13660: bl sym.imp.strcpy → Tainted data copied to 0x1c-byte fixed buffer (destination address passed via r0)
@@ -1108,7 +1108,7 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_multi_TD01.bin.extracted/squashfs-root/bin/netctrl
-  Propagation:
+  Taint Propagation Path:
     - Source: 0xdc3c: bl sym.imp.GetValue('ipv6.lan.ipv6_addr', r1=r4+0x13f4) --> Reads NVRAM value into buffer
     - Step: 0xdc64: add r3, r4, 0x13f4 --> Calculates address of tainted buffer (r4+0x13f4)
     - Step: 0xdc68: mov r1, r3 --> Loads tainted address into parameter register r1
@@ -1118,7 +1118,7 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_multi_TD01.bin.extracted/squashfs-root/bin/speedtest
-  Propagation:
+  Taint Propagation Path:
     - Source: sym.GetValue('speedtest.addr.listnum') returns string @ 0xad68 (actual address, offset clue 0xad50)
     - Step: 0x9f18: uVar2 = sym.imp.atoi(*(sp + 0x28)) --> Converts NVRAM string to integer
     - Step: 0x9f34: *(sp + 0x10) = uVar2 --> Stored as loop upper limit
@@ -1132,7 +1132,7 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_multi_TD01.bin.extracted/squashfs-root/bin/speedtest
-  Propagation:
+  Taint Propagation Path:
     - Source: sym.imp.GetValue('speedtest.addr.listnum') returns string at 0xad50 (fcn.00009e00)
     - Step: uVar2 = sym.imp.atoi(puVar6 + 8 + -0x657ac) --> NVRAM string converted to integer stored at *(puVar6 + -0x10)
     - Step: if (*(puVar6 + -0x10) != 0) --> Branch condition directly depends on tainted value
@@ -1143,7 +1143,7 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_multi_TD01.bin.extracted/squashfs-root/bin/speedtest
-  Propagation:
+  Taint Propagation Path:
     - Source: GetValue('speedtest.addr.listnum') returns string at 0xad50 (fcn.00009e00 @ 0x9f04)
     - Step: bl sym.imp.atoi @ 0x9f18 --> converts string to integer
     - Step: str r0, [var_18h] @ 0x9f1c --> stores tainted integer
@@ -1157,7 +1157,7 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC15V1.0BR_V15.03.05.18_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC18V1.0BR_V15.03.05.05_multi_TD01.bin.extracted/squashfs-root/usr/sbin/udhcpc
-  Propagation:
+  Taint Propagation Path:
     - Source: DHCP response via UDP socket created at 0xd734
     - Step: 0x0000d734: bl sym.imp.socket --> UDP socket creation
     - Step: 0x00009d14: bl fcn.0000d084 --> Entry to DHCP response handler
@@ -1165,12 +1165,12 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC18V1.0BR_V15.03.05.05_
     - Step: 0x0000c1ec: mov r7, r0 --> Tainted data transfer (r0→r7)
     - Step: 0x0000c294: mov r1, r7 --> Preparing strcpy source argument (r7→r1)
     - Sink: 0x0000c2a0: bl sym.imp.strcpy --> Buffer overflow with tainted DHCP data in r1
-  Reason: Radare2 verification confirms: 1) All key address instructions perfectly match the clues 2) Complete taint propagation path: DHCP data passed into fcn.0000c1dc via r0 → transferred to r7 via mov instruction → finally loaded into strcpy's source register r1 3) No data sanitization operations found in the path. An attacker can trigger a buffer overflow by crafting a malicious DHCP response.
+  Reason: Radare2 verification confirms: 1) All key address instructions perfectly match the clues 2) Complete taint Taint Propagation Path path: DHCP data passed into fcn.0000c1dc via r0 → transferred to r7 via mov instruction → finally loaded into strcpy's source register r1 3) No data sanitization operations found in the path. An attacker can trigger a buffer overflow by crafting a malicious DHCP response.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC18V1.0BR_V15.03.05.05_multi_TD01.bin.extracted/squashfs-root/usr/sbin/udhcpc
-  Propagation:
+  Taint Propagation Path:
     - Source: DHCP response received via socket created at 0xdd14 (AF_INET/SOCK_DGRAM)
     - Step: 0x0000dd14: bl sym.imp.socket --> [UDP socket creation]
     - Step: 0x00009d0c: ldr r1, [var_24h] --> [Load DHCP response data into r1]
@@ -1184,7 +1184,7 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC18V1.0BR_V15.03.05.05_
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC6V1.0BR_V15.03.05.16_multi_TD01.bin.extracted/squashfs-root/bin/multiWAN
-  Propagation:
+  Taint Propagation Path:
     - Source: GetValue("wan1337.dns2") at 0x15474: bl sym.imp.GetValue → Tainted data stored in [SP-0xf4]
     - Step: 0x15610: mov r0, r2; mov r1, r3; bl sym.imp.vos_strcpy → Copy tainted data to [SP-0xe0] buffer
     - Step: 0x15ea0: sub r1, var_e0h → Load base address of [SP-0xe0] into r1
@@ -1196,12 +1196,12 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC6V1.0BR_V15.03.05.16_m
     - Step: 0x15eb8: add r3, r1, r3 → r3 = Base address of [SP-0xe0] + Offset
     - Step: 0x15ec8: mov r1, r3 → Pass tainted address as parameter to doSystemCmd
     - Sink: 0x15ecc: bl sym.imp.doSystemCmd → Execute tainted data
-  Reason: Complete evidence chain: 1) External input obtained via GetValue is directly passed; 2) vos_strcpy copies to stack buffer without sanitization; 3) Target address is calculated through arithmetic operations and passed to doSystemCmd. The ldr operation at 0x15ecc mentioned in the clue does not exist (actual operation is direct call), but the propagation path via stack buffer remains valid. Controlling wan1337.dns2 allows attackers to inject arbitrary commands.
+  Reason: Complete evidence chain: 1) External input obtained via GetValue is directly passed; 2) vos_strcpy copies to stack buffer without sanitization; 3) Target address is calculated through arithmetic operations and passed to doSystemCmd. The ldr operation at 0x15ecc mentioned in the clue does not exist (actual operation is direct call), but the Taint Propagation Path path via stack buffer remains valid. Controlling wan1337.dns2 allows attackers to inject arbitrary commands.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC6V1.0BR_V15.03.05.16_multi_TD01.bin.extracted/squashfs-root/bin/multiWAN
-  Propagation:
+  Taint Propagation Path:
     - Source: GetValue('lan.ip') at 0x11a14 --> Result stored in stack [var_140h] at 0x11a28: str r0, [var_140h]
     - Step: 0x11da8: ldr r3, [var_140h] --> Loads tainted lan.ip value into r3
     - Step: 0x11dac: add r3, r3, 1 --> Numerical manipulation (IP+1)
@@ -1212,7 +1212,7 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC6V1.0BR_V15.03.05.16_m
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC9V1.0BR_V15.03.05.14_multi_TD01.bin.extracted/squashfs-root/bin/multiWAN
-  Propagation:
+  Taint Propagation Path:
     - Source: NVRAM variable 'wan1337.dns1' retrieved by GetValue at 0xe4d8
     - Step: 0xe4bc: mov r1, r2 --> Loads format string address for sprintf (key construction)
     - Step: 0xe4c4: bl sym.imp.sprintf --> Constructs NVRAM key in stack buffer (offset -0x2c)
@@ -1223,7 +1223,7 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC9V1.0BR_V15.03.05.14_m
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC9V1.0BR_V15.03.05.14_multi_TD01.bin.extracted/squashfs-root/bin/multiWAN
-  Propagation:
+  Taint Propagation Path:
     - Source: 0x14288 `bl sym.imp.GetValue("wan3.macaddr", var_a0h)` --> Reads NVRAM data into stack buffer var_a0h
     - Step: 0x142a0 `cmp r3, 6; bls 0x14310` --> If r3>6, bypasses the sanitization branch
     - Step: 0x142d0 `sub r3, var_a0h` --> Loads address of tainted buffer into r3
@@ -1234,16 +1234,16 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC9V1.0BR_V15.03.05.14_m
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC9V1.0BR_V15.03.05.14_multi_TD01.bin.extracted/squashfs-root/bin/multiWAN
-  Propagation:
+  Taint Propagation Path:
     - Source: 0x17c68: bl sym.imp.GetValue --> Retrieves 'wan1337.mask' configuration value and directly stores it to stack variable var_370h
     - Step: 0x17de4: sub r3, var_370h --> Loads the address of tainted data (var_370h) into register r3
     - Sink: 0x17df8: bl sym.imp.doSystemCmd --> Calls command execution function with r3 as parameter (tainted data address as 4th argument)
-  Reason: Based on r2 disassembly evidence: 1) GetValue result directly written to var_370h (0x17c64: mov r1, r2 specifies target address); 2) No subsequent sanitization operations; 3) var_370h address directly passed during doSystemCmd call (0x17de4); 4) Attackers can inject command separators via wan1337.mask. Consistent with the described propagation path of unfiltered user input.
+  Reason: Based on r2 disassembly evidence: 1) GetValue result directly written to var_370h (0x17c64: mov r1, r2 specifies target address); 2) No subsequent sanitization operations; 3) var_370h address directly passed during doSystemCmd call (0x17de4); 4) Attackers can inject command separators via wan1337.mask. Consistent with the described Taint Propagation Path path of unfiltered user input.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC9V1.0BR_V15.03.05.14_multi_TD01.bin.extracted/squashfs-root/bin/multiWAN
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.GetValue('wl.guest.dhcps_ifname') at 0xb92c --> Retrieves unvalidated user input from configuration file
     - Step: mov r0, r2; mov r1, r3 at 0xb948-0xb94c --> Loads destination buffer address (r2) and tainted data address (r3) into parameter registers
     - Sink: bl sym.imp.vos_strcpy at 0xb950 --> Copies tainted data without bounds checking into fixed-size stack buffer
@@ -1252,7 +1252,7 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC9V1.0BR_V15.03.05.14_m
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC9V1.0BR_V15.03.05.14_multi_TD01.bin.extracted/squashfs-root/bin/wps_monitor
-  Propagation:
+  Taint Propagation Path:
     - Source: sym.imp.nvram_get("lan_hwaddr") @ 0x10670
     - Step: 0x10674: str r0, [sp, #0x28] --> Tainted data stored in stack variable
     - Step: 0x10688: ldr r0, [sp, #0x28]; bl sym.imp.ether_atoe --> Passed to MAC conversion function
@@ -1265,7 +1265,7 @@ Binary Path: /media/Elements/karonte/Tenda/analyzed/_US_AC9V1.0BR_V15.03.05.14_m
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/DIR-868L_fw_revA_1-12_eu_multi_20170316/fw/_DIR868LA1_FW112b04.bin.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - 0xb83c: bl sym.imp.getenv (EDITOR environment variable value stored in r0)
     - 0xb840: subs r5, r0, 0 (Tainted value transferred to r5)
     - 0xb994: mov r0, r5 (Child process context: tainted value loaded into execlp's 1st parameter)
@@ -1276,7 +1276,7 @@ Binary Path: /media/Elements/karonte/d-link/analyzed/DIR-868L_fw_revA_1-12_eu_mu
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/DIR-868L_fw_revA_1-12_eu_multi_20170316/fw/_DIR868LA1_FW112b04.bin.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: Function parameter (r0) stored at [sp+0x410] in sym.lxmldbc_system
     - Step: 0x0000f620: ldr r2, [sp, 0x410] --> Load tainted format string into r2
     - Step: 0x0000f62c: bl sym.imp.vsnprintf(r0=sp+4, r1=0x400, r2=tainted_str, r3=sp+0x414) --> Format command to stack buffer
@@ -1287,7 +1287,7 @@ Binary Path: /media/Elements/karonte/d-link/analyzed/DIR-868L_fw_revA_1-12_eu_mu
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/DIR-868L_fw_revA_1-12_eu_multi_20170316/fw/_DIR868LA1_FW112b04.bin.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: param_1 @ sym.processInternal (0xcebc: mov r0, r5)
     - Step: 0xcec0: bl sym.expandPath(r0) --> param_1 is directly passed to the path expansion function
     - Step: 0xed14 (inside expandPath): sym.dsbCopy(iVar2, param_1) --> Tainted data is copied to the return value variable without filtering
@@ -1298,16 +1298,16 @@ Binary Path: /media/Elements/karonte/d-link/analyzed/DIR-868L_fw_revA_1-12_eu_mu
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/DIR-868L_fw_revA_1-12_eu_multi_20170316/fw/_DIR868LA1_FW112b04.bin.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: Function parameters (param_3: format string, param_4: args) in sym.lxmldbc_run_shell
     - Step: sym.imp.vsnprintf(iVar4, 0x400, *(puVar6 + 0x14), puVar6 + 0x18) --> Formats command using tainted parameters into buffer iVar4
     - Step: sym.imp.popen(iVar4, *0xf5f4) --> Direct execution of formatted command (mode="r" at 0x1263c)
-  Reason: Radare2 analysis confirms: 1) Function parameters are directly used as input for vsnprintf; 2) The output buffer of vsnprintf is directly passed to popen; 3) The mode of popen is "r"; 4) There are no data sanitization operations throughout the propagation path. An attacker can fully control the executed command by controlling the function parameters.
+  Reason: Radare2 analysis confirms: 1) Function parameters are directly used as input for vsnprintf; 2) The output buffer of vsnprintf is directly passed to popen; 3) The mode of popen is "r"; 4) There are no data sanitization operations throughout the Taint Propagation Path path. An attacker can fully control the executed command by controlling the function parameters.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/DIR-868L_fw_revA_1-12_eu_multi_20170316/fw/_DIR868LA1_FW112b04.bin.extracted/squashfs-root/usr/sbin/email
-  Propagation:
+  Taint Propagation Path:
     - Source: Environment variable 'EDITOR' read via getenv() at 0xb83c
     - Step: 0xb840: subs r5, r0, #0 ; Store getenv result in r5
     - Step: 0xb994: mov r0, r5      ; Move tainted EDITOR value to r0 (execlp 1st arg)
@@ -1318,17 +1318,17 @@ Binary Path: /media/Elements/karonte/d-link/analyzed/DIR-868L_fw_revA_1-12_eu_mu
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/DIR-895L_fw_revA_1-13_eu_multi_20170113/_DIR895LA1_FW113b03.bin.extracted/squashfs-root/htdocs/cgibin
-  Propagation:
+  Taint Propagation Path:
     - Source: HTTP_COOKIE constructs a path passed as parameter r0 to the function @0x0001061c
     - Step: str r0, [filename] @0x00010628 --> Tainted data stored in stack variable
     - Step: ldr r0, [filename] @0x000106ac --> Loads tainted path into register
     - Sink: bl sym.imp.fopen @0x000106b4 --> Tainted data directly used as fopen parameter
-  Reason: Based on r2 evidence: 1) Function entry parameter r0 is explicitly stored to stack location (filename); 2) This stack location data is directly loaded back into r0; 3) r0 is passed to fopen without any sanitization. No data modification/validation instructions in the path, consistent with the complete propagation chain from HTTP_COOKIE to file operation as described in the clue.
+  Reason: Based on r2 evidence: 1) Function entry parameter r0 is explicitly stored to stack location (filename); 2) This stack location data is directly loaded back into r0; 3) r0 is passed to fopen without any sanitization. No data modification/validation instructions in the path, consistent with the complete Taint Propagation Path chain from HTTP_COOKIE to file operation as described in the clue.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/_DIR826LA1_FW105B13.bin.extracted/squashfs-root/bin/tc
-  Propagation:
+  Taint Propagation Path:
     - Source: 0x40856c: jalr t9 → getenv("TC_LIB_DIR") (returns to $v0)
     - Step: 0x00403f84: jalr t9 → sym.get_tc_lib (propagates return value to $v0)
     - Step: 0x00403f90: move a3, v0 (taint transferred to a3 register)
@@ -1339,7 +1339,7 @@ Binary Path: /media/Elements/karonte/d-link/analyzed/_DIR826LA1_FW105B13.bin.ext
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/_DIR826LA1_FW105B13.bin.extracted/squashfs-root/bin/tc
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("TC_LIB_DIR") called in sym.get_tc_lib at 0x40856c
     - Step: 0x0040bf48: jalr t9 --> Calls sym.get_tc_lib, returns value in $v0
     - Step: 0x0040bf54: move a3, v0 --> Tainted env value moved to a3 register
@@ -1350,17 +1350,17 @@ Binary Path: /media/Elements/karonte/d-link/analyzed/_DIR826LA1_FW105B13.bin.ext
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/_DIR826LA1_FW105B13.bin.extracted/squashfs-root/bin/tc
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("TC_LIB_DIR") @ sym.get_tc_lib (0x00408574: jalr t9 --> Calls getenv, return value in $v0)
     - Step: 0x004041a4: move a3, v0 --> Tainted env value moved to a3 register
     - Step: 0x004041b0: snprintf(sp+0x20, 0x100, "%s/f_%s.so", a3) [0x004041b4: addiu a0, sp, 0x20; 0x004041b8: addiu a1, zero, 0x100; 0x004041bc: jalr t9] --> Formats path using tainted a3 value
     - Sink: 0x004041c8: dlopen(sp+0x20) [0x004041c8: addiu a0, sp, 0x20; 0x004041d4: jalr t9] --> Tainted path passed to dlopen()
-  Reason: Radare2 evidence confirms the complete propagation path: 1) The return value of getenv is directly used for path formatting (without validation); 2) The buffer output by snprintf is directly passed to dlopen; 3) All key addresses exist and the instruction semantics match; 4) There are no sanitization operations. An attacker can load arbitrary libraries by controlling TC_LIB_DIR.
+  Reason: Radare2 evidence confirms the complete Taint Propagation Path path: 1) The return value of getenv is directly used for path formatting (without validation); 2) The buffer output by snprintf is directly passed to dlopen; 3) All key addresses exist and the instruction semantics match; 4) There are no sanitization operations. An attacker can load arbitrary libraries by controlling TC_LIB_DIR.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/_DIR826LA1_FW105B13.bin.extracted/squashfs-root/bin/tc
-  Propagation:
+  Taint Propagation Path:
     - Source: getenv("TC_LIB_DIR") @ sym.get_tc_lib (0x00408574)
     - Step: 0x0040bf54: move a3, v0 --> Tainted env value moved to a3 register
     - Step: 0x0040bf64: addiu a0, sp, 0x20 --> Set output buffer address
@@ -1373,16 +1373,16 @@ Binary Path: /media/Elements/karonte/d-link/analyzed/_DIR826LA1_FW105B13.bin.ext
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/_DIR826LA1_FW105B13.bin.extracted/squashfs-root/bin/tc
-  Propagation:
+  Taint Propagation Path:
     - Source: argv[2] @0x4046b0 (main): lw s2, 8(s0)  ; Load batch file name into register s2
     - Step: 0x404748: move a0, s2  ; Tainted data moved into freopen parameter register a0
     - Sink: 0x404744: jalr t9 (t9=sym.imp.freopen)  ; freopen(a0, "r", a2) where a2=NULL
-  Reason: 1) Taint propagation path successfully verified: argv[2] reaches the path parameter of freopen directly via s2; 2) Vulnerability exists but is limited: Parameter a2 is NULL (evidence: value at gp-0x7d10=0x47e480 is 0), preventing file redirection to stdin. This can only cause a crash (denial of service) and cannot achieve the arbitrary file read described in the clue.
+  Reason: 1) Taint Taint Propagation Path path successfully verified: argv[2] reaches the path parameter of freopen directly via s2; 2) Vulnerability exists but is limited: Parameter a2 is NULL (evidence: value at gp-0x7d10=0x47e480 is 0), preventing file redirection to stdin. This can only cause a crash (denial of service) and cannot achieve the arbitrary file read described in the clue.
 </finding>
 -------------------------------------------
 <finding>
 Binary Path: /media/Elements/karonte/d-link/analyzed/_DIR890LA1_FW111b02_20170519_beta01.bin.extracted/squashfs-root/htdocs/fileaccess.cgi
-  Propagation:
+  Taint Propagation Path:
     - Source: bl sym.imp.getenv("REQUEST_URI") @ 0xadbc (Tainted data pointer stored in r0)
     - Step: 0xadc0: str r0, [sp,#8] --> Tainted pointer stored at stack offset 8
     - Step: 0xae14: ldr r2, [sp,#8] --> Load tainted pointer into r2
